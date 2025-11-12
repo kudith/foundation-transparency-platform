@@ -38,22 +38,26 @@ const config = {
     accessMaxAge: 15 * 60 * 1000, // 15 minutes for access token
   },
   cors: {
-    origin: process.env.FRONTEND_URL || process.env.CLIENT_URL || "http://localhost:5173",
+    origin:
+      process.env.FRONTEND_URL ||
+      process.env.CLIENT_URL ||
+      "http://localhost:5173",
     credentials: true,
+  },
+  bcrypt: {
+    rounds: Number.parseInt(process.env.BCRYPT_ROUNDS, 10) || 10,
   },
 };
 
 // Validate required config
-const requiredEnvVars = [
-  "MONGODB_URI",
-  "JWT_SECRET",
-  "JWT_REFRESH_SECRET",
-];
+const requiredEnvVars = ["MONGODB_URI", "JWT_SECRET", "JWT_REFRESH_SECRET"];
 
 const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
-  console.error(`Missing required environment variables: ${missingEnvVars.join(", ")}`);
+  console.error(
+    `Missing required environment variables: ${missingEnvVars.join(", ")}`
+  );
   console.error(`Current environment: ${env}`);
   console.error(`Looking for file: ${envPath}`);
   process.exit(1);
