@@ -1,4 +1,4 @@
-import User from "../models/user.js";
+import User from "../models/admin.js";
 import { comparePassword } from "../utils/password.js";
 import {
   generateAccessToken,

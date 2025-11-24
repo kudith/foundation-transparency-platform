@@ -1,14 +1,18 @@
 import { Routes, Route } from "react-router-dom";
 import { useAuthInit } from "../hooks/useAuthInit";
 import Home from "./Home";
+import About from "./About";
 import Programs from "./Programs";
 import ProgramDetail from "./ProgramDetail";
+import Contact from "./Contact";
 import NotFound from "./NotFound";
 import Forbidden from "./Forbidden";
 import Unauthorized from "./Unauthorized";
 import ServerError from "./ServerError";
 import ServiceUnavailable from "./ServiceUnavailable";
 import AdminLogin from "./admin/Login";
+import AdminLayout from "../components/admin/layout/AdminLayout";
+import Dashboard from "./admin/Dashboard";
 import ProtectedRoute from "../components/admin/ProtectedRoute";
 import "../styles/App.css";
 
@@ -19,21 +23,21 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/tentang" element={<About />} />
       <Route path="/program" element={<Programs />} />
       <Route path="/program/:id" element={<ProgramDetail />} />
+      <Route path="/kontak" element={<Contact />} />
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />
-
-      {/* Protected Admin Routes - Uncomment saat sudah ada Dashboard */}
-      {/* <Route
-        path="/admin/dashboard"
+      <Route
+        path="/admin/*"
         element={
           <ProtectedRoute>
-            <AdminDashboard />
+            <AdminLayout />
           </ProtectedRoute>
         }
-      /> */}
+      />
 
       {/* Error Pages */}
       <Route path="/401" element={<Unauthorized />} />

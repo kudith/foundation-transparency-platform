@@ -1,4 +1,8 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner"; // pastikan ada komponen Spinner
 
 const LoginForm = ({ onSubmit, isLoading }) => {
   const [formData, setFormData] = useState({
@@ -20,53 +24,49 @@ const LoginForm = ({ onSubmit, isLoading }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label
-          htmlFor="email"
-          className="block font-serif text-sm font-medium text-gray-700 mb-2"
-        >
+      <div className="space-y-2">
+        <Label htmlFor="email" className="font-serif">
           Email
-        </label>
-        <input
+        </Label>
+        <Input
           id="email"
           name="email"
           type="email"
           required
           value={formData.email}
           onChange={handleChange}
-          className="w-full px-4 py-3 border border-gray-300 font-serif text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
           placeholder="admin@veritas.org"
           disabled={isLoading}
+          className="font-serif rounded-none"
         />
       </div>
 
-      <div>
-        <label
-          htmlFor="password"
-          className="block font-serif text-sm font-medium text-gray-700 mb-2"
-        >
+      <div className="space-y-2">
+        <Label htmlFor="password" className="font-serif">
           Password
-        </label>
-        <input
+        </Label>
+        <Input
           id="password"
           name="password"
           type="password"
           required
           value={formData.password}
           onChange={handleChange}
-          className="w-full px-4 py-3 border border-gray-300 font-serif text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
           placeholder="••••••••"
           disabled={isLoading}
+          className="font-serif rounded-none"
         />
       </div>
 
-      <button
+      <Button
         type="submit"
         disabled={isLoading}
-        className="w-full font-serif font-semibold px-6 py-3 bg-gray-900 text-white hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+        className="w-full font-serif font-semibold flex items-center justify-center gap-2"
+        size="lg"
       >
+        {isLoading && <Spinner className="size-4" />}
         {isLoading ? "Memproses..." : "Masuk"}
-      </button>
+      </Button>
     </form>
   );
 };

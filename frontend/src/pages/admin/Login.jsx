@@ -1,6 +1,39 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 import LoginForm from "../../components/admin/LoginForm";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+
+const getErrorMessage = (error) => {
+  if (!error) return null;
+  if (
+    error.toLowerCase().includes("invalid") ||
+    error.toLowerCase().includes("unauthorized") ||
+    error.toLowerCase().includes("not found") ||
+    error.toLowerCase().includes("user") ||
+    error.toLowerCase().includes("password")
+  ) {
+    return "Email atau password salah. Silakan periksa kembali.";
+  }
+  if (
+    error.toLowerCase().includes("network") ||
+    error.toLowerCase().includes("timeout")
+  ) {
+    return "Tidak dapat terhubung ke server. Silakan cek koneksi internet Anda.";
+  }
+  if (
+    error.toLowerCase().includes("server") ||
+    error.toLowerCase().includes("internal")
+  ) {
+    return "Terjadi kesalahan pada server. Silakan coba beberapa saat lagi.";
+  }
+  return error;
+};
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,40 +48,44 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md mb-6">
         <Link to="/" className="flex justify-center">
-          <h1 className="font-serif font-bold text-2xl text-gray-900">
+          <h1 className="font-serif font-bold text-2xl text-foreground">
             Veritas Pelita Nusantara
           </h1>
         </Link>
-        <h2 className="mt-6 text-center font-serif text-3xl font-bold text-gray-900">
-          Login Admin
-        </h2>
-        <p className="mt-2 text-center font-serif text-sm text-gray-600">
-          Masuk ke panel administrasi
-        </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-sm border border-gray-200 sm:px-10">
-          {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 font-serif text-sm">
-              {error}
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-serif text-3xl font-bold text-foreground text-center">
+              Login Admin
+            </CardTitle>
+            <CardDescription className="font-serif text-center">
+              Masuk ke panel administrasi
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {error && (
+              <div className="mb-4 p-3 rounded border border-destructive/30 bg-destructive/10 text-destructive font-serif text-sm text-center">
+                {getErrorMessage(error)}
+              </div>
+            )}
+
+            <LoginForm onSubmit={onSubmit} isLoading={isLoading} />
+
+            <div className="mt-6 text-center">
+              <Link
+                to="/"
+                className="font-serif text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                ← Kembali ke Beranda
+              </Link>
             </div>
-          )}
-
-          <LoginForm onSubmit={onSubmit} isLoading={isLoading} />
-
-          <div className="mt-6">
-            <Link
-              to="/"
-              className="font-serif text-sm text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              ← Kembali ke Beranda
-            </Link>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

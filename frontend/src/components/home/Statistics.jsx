@@ -1,5 +1,14 @@
 import { useEffect } from "react";
-import { useProgramStore } from "../../store/useProgramStore";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import { useProgramStore } from "@/store/useProgramStore";
 
 const Statistics = () => {
   const { statistics, fetchStatistics } = useProgramStore();
@@ -16,32 +25,60 @@ const Statistics = () => {
     {
       label: "Total Program",
       value: statistics.totalPrograms,
+      description: "Inisiatif transparansi yang dijalankan sepanjang tahun ini.",
     },
     {
       label: "Program Aktif",
       value: statistics.activePrograms,
+      description: "Program yang sedang berjalan dan menerima monitoring rutin.",
     },
     {
       label: "Total Anggaran",
-      value: `Rp ${(statistics.totalBudget / 1000000000).toFixed(1)}M`,
+      value: `Rp ${(statistics.totalBudget / 1_000_000_000).toFixed(1)}M`,
+      description: "Nilai akumulasi dana yang telah dialokasikan untuk program.",
     },
     {
       label: "Penerima Manfaat",
-      value: statistics.totalBeneficiaries.toLocaleString(),
+      value: statistics.totalBeneficiaries.toLocaleString("id-ID"),
+      description: "Individu dan komunitas yang merasakan dampak nyata.",
     },
   ];
 
   return (
-    <section className="bg-gray-900 text-white py-16">
-      <div className="container mx-auto px-6 max-w-6xl">
-        <div className="grid md:grid-cols-4 gap-8">
-          {stats.map((stat, index) => (
-            <div key={index} className="text-center">
-              <p className="font-serif text-4xl font-bold mb-2">{stat.value}</p>
-              <p className="font-serif text-gray-400 text-sm uppercase tracking-wide">
-                {stat.label}
-              </p>
-            </div>
+    <section className="bg-foreground/95 py-16 md:py-20">
+      <div className="mx-auto max-w-6xl px-4 lg:px-6">
+        <div className="mb-12 max-w-3xl text-center md:mx-auto">
+          <p className="font-serif text-sm uppercase tracking-[0.3em] text-primary/80">
+            Dampak Kami
+          </p>
+          <h2 className="mt-4 font-serif text-3xl font-semibold text-background md:text-4xl">
+            Data yang Menjaga Kepercayaan Publik
+          </h2>
+          <p className="mt-4 font-serif text-base text-background/70">
+            Setiap angka adalah representasi dari komitmen kami menjaga akuntabilitas dan transparansi kepada para pemangku kepentingan.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <Card
+              key={stat.label}
+              className="border-border/40 bg-background/95 text-foreground"
+            >
+              <CardHeader>
+                <CardTitle className="font-serif text-3xl font-semibold text-foreground">
+                  {stat.value}
+                </CardTitle>
+                <CardDescription className="font-serif text-sm uppercase tracking-wide text-muted-foreground">
+                  {stat.label}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="font-serif text-sm text-muted-foreground">
+                  {stat.description}
+                </p>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>

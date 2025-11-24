@@ -2,6 +2,7 @@ import config from "./config/index.js";
 import dotenv from "dotenv";
 import connectDB from "./config/database.js";
 import createWebServer from "./config/web.js";
+import { initRedis, closeRedis } from "./config/redis.js";
 
 // Load environment variables
 dotenv.config();
@@ -10,6 +11,9 @@ const startServer = async () => {
   try {
     // Connect to database
     await connectDB();
+
+    // Connect to Redis
+    await initRedis();
 
     // Create web server
     const app = createWebServer();
@@ -22,10 +26,11 @@ const startServer = async () => {
     });
 
     // Graceful shutdown
-    const gracefulShutdown = () => {
+    const gracefulShutdown = async () => {
       console.log("\nReceived shutdown signal, closing server gracefully...");
-      server.close(() => {
+      server.close(async () => {
         console.log("Server closed");
+        await closeRedis(); // Tutup koneksi Redis saat shutdown
         process.exit(0);
       });
 

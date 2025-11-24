@@ -1,27 +1,43 @@
 import { Link } from "react-router-dom";
+import { ArrowUpRight } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 
 const Hero = () => {
   return (
-    <section className="bg-white py-32 md:py-40 mt-16">
-      <div className="container mx-auto px-6 text-center max-w-4xl">
-        <h1 className="font-serif text-4xl md:text-6xl font-bold text-gray-900 leading-tight">
-          Transparansi dan Akuntabilitas untuk Masa Depan yang Lebih Terang
-        </h1>
-
-        <p className="mt-8 font-serif text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
-          Yayasan Veritas Pelita Nusantara berkomitmen untuk mewujudkan
-          keterbukaan penuh dalam setiap aspek operasional kami. Kami percaya
-          bahwa transparansi adalah fondasi kepercayaan dan akuntabilitas adalah
-          jalan menuju dampak yang berkelanjutan.
+    <section className="relative bg-background pt-28 pb-24 md:pt-32">
+      <div className="mx-auto max-w-4xl px-4 flex flex-col items-center text-center md:px-6">
+        <p className="font-serif text-sm uppercase tracking-[0.3em] text-muted-foreground">
+          Transparansi • Akuntabilitas • Dampak
         </p>
-
-        <div className="mt-12">
-          <Link
-            to="/programs"
-            className="inline-block font-serif font-semibold px-8 py-3 bg-white text-gray-900 border-2 border-gray-900 hover:bg-gray-100 transition-colors"
+        <h1 className="mt-6 font-serif text-4xl font-semibold leading-tight text-foreground md:text-6xl md:leading-[1.05]">
+          Masa Depan yang Lebih Terang Melalui Kepercayaan Publik
+        </h1>
+        <p className="mt-6 font-serif text-lg text-muted-foreground md:text-xl">
+          Yayasan Veritas Pelita Nusantara berkomitmen membuka akses
+          seluas-luasnya terhadap laporan keuangan dan dampak sosial. Kami
+          percaya keterbukaan adalah fondasi kepercayaan, dan akuntabilitas
+          adalah jalan menuju perubahan berkelanjutan.
+        </p>
+        <div className="mt-10 flex flex-col items-center gap-3 md:flex-row md:items-center md:justify-start lg:justify-start">
+          <Button
+            size="lg"
+            asChild
+            className="h-12 px-6 font-serif text-base shadow-lg"
           >
-            Lihat Program Kami
-          </Link>
+            <Link to="/program">
+              Jelajahi Program
+              <ArrowUpRight className="ml-2 size-4" />
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="lg"
+            asChild
+            className="h-12 px-6 font-serif text-base text-muted-foreground hover:text-foreground border-2 shadow-lg"
+          >
+            <Link to="/kontak">Diskusi Transparansi</Link>
+          </Button>
         </div>
       </div>
     </section>

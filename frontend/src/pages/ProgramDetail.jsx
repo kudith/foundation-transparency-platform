@@ -1,220 +1,386 @@
-import { useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { useProgramStore } from "../store/useProgramStore";
-import Header from "../components/home/Header";
-import Footer from "../components/home/Footer";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+
+import Footer from "@/components/home/Footer";
+import Header from "@/components/home/Header";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  Calendar,
+  MapPin,
+  User,
+  Users,
+  Image as ImageIcon,
+} from "lucide-react";
+import { getEventById } from "@/services/eventService";
+
+const formatDate = (value) => {
+  if (!value) return "-";
+  return new Date(value).toLocaleDateString("id-ID", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+const getEventStatus = (dateString) => {
+  const eventDate = new Date(dateString);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  eventDate.setHours(0, 0, 0, 0);
+
+  if (eventDate < today) {
+    return { label: "Selesai", color: "bg-muted text-muted-foreground" };
+  } else if (eventDate.toDateString() === today.toDateString()) {
+    return { label: "Hari Ini", color: "bg-primary text-primary-foreground" };
+  } else {
+    return { label: "Akan Datang", color: "bg-blue-500 text-white" };
+  }
+};
 
 const ProgramDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { selectedProgram, loading, error, fetchProgramById } =
-    useProgramStore();
+  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
-    fetchProgramById(id);
-  }, [id, fetchProgramById]);
+    if (id) {
+      fetchEvent();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  const fetchEvent = async () => {
+    setLoading(true);
+    setError(null);
+
+    const result = await getEventById(id);
+
+    if (result.success) {
+      setEvent(result.data);
+    } else {
+      setError(result.error);
+    }
+
+    setLoading(false);
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-screen flex-col bg-background text-foreground">
         <Header />
-        <div className="flex-grow flex items-center justify-center py-32 mt-16">
-          <p className="font-serif text-gray-600">Memuat detail program...</p>
-        </div>
+        <main className="mt-16 flex flex-1 items-center justify-center px-4">
+          <div className="flex flex-col items-center gap-3">
+            <Spinner className="size-6 text-primary" />
+            <p className="font-serif text-sm text-muted-foreground">
+              Memuat detail program...
+            </p>
+          </div>
+        </main>
         <Footer />
       </div>
     );
   }
 
-  if (error || !selectedProgram) {
+  if (error || !event) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-screen flex-col bg-background text-foreground">
         <Header />
-        <div className="flex-grow flex flex-col items-center justify-center py-32 mt-16">
-          <p className="font-serif text-red-600 mb-6">
-            {error || "Program tidak ditemukan"}
-          </p>
-          <button
-            onClick={() => navigate("/program")}
-            className="font-serif text-sm text-gray-900 border-b border-gray-900 hover:text-gray-600 hover:border-gray-600"
-          >
-            ← Kembali ke Program
-          </button>
-        </div>
+        <main className="mt-16 flex flex-1 flex-col items-center justify-center px-4">
+          <Card className="max-w-md border-destructive/40 bg-destructive/10 text-center">
+            <CardHeader>
+              <CardTitle className="font-serif text-foreground">
+                Tidak Dapat Menampilkan Program
+              </CardTitle>
+              <CardDescription className="font-serif text-sm text-destructive">
+                {error || "Program tidak ditemukan atau telah dihapus."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="outline"
+                className="font-serif text-sm"
+                onClick={() => navigate("/program")}
+              >
+                Kembali ke Daftar Program
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
         <Footer />
       </div>
     );
   }
+
+  const status = getEventStatus(event.date);
+  const images = event.images || [];
+  const hasImages = images.length > 0;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       <Header />
 
-      {/* Breadcrumb */}
-      <section className="bg-gray-50 py-6 mt-16 border-b border-gray-200">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <div className="flex items-center gap-2 font-serif text-sm text-gray-600">
-            <Link to="/" className="hover:text-gray-900">
-              Beranda
-            </Link>
-            <span>→</span>
-            <Link to="/program" className="hover:text-gray-900">
-              Program
-            </Link>
-            <span>→</span>
-            <span className="text-gray-900">{selectedProgram.title}</span>
-          </div>
-        </div>
-      </section>
+      <main className="flex flex-1 flex-col">
+        {/* Hero Section */}
+        <section className="relative bg-background px-4 pt-24 pb-16 md:px-6">
+          <div className="mx-auto max-w-6xl">
+            {/* Breadcrumb & Status */}
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <Link
+                to="/program"
+                className="font-serif text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                ← Kembali ke Program
+              </Link>
+              <Badge className={status.color}>{status.label}</Badge>
+              <Badge variant="outline" className="font-serif">
+                {event.community || event.communityName}
+              </Badge>
+            </div>
 
-      {/* Hero */}
-      <section className="bg-white py-16 md:py-24">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="font-serif text-sm text-gray-500 uppercase tracking-wide">
-              {selectedProgram.category}
-            </span>
-            <span
-              className={`font-serif text-xs px-3 py-1 border ${
-                selectedProgram.status === "Aktif"
-                  ? "border-gray-900 text-gray-900"
-                  : "border-gray-400 text-gray-600"
-              }`}
-            >
-              {selectedProgram.status}
-            </span>
-          </div>
+            {/* Title & Description */}
+            <h1 className="font-serif text-4xl font-bold text-foreground md:text-5xl mb-6">
+              {event.name}
+            </h1>
 
-          <h1 className="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            {selectedProgram.title}
-          </h1>
+            {event.description && (
+              <p className="font-serif text-lg text-muted-foreground max-w-3xl mb-8">
+                {event.description}
+              </p>
+            )}
 
-          <p className="font-serif text-xl text-gray-600 leading-relaxed max-w-4xl">
-            {selectedProgram.description}
-          </p>
-        </div>
-      </section>
-
-      {/* Key Information */}
-      <section className="bg-gray-50 py-16">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <h2 className="font-serif text-2xl font-bold text-gray-900 mb-8">
-            Informasi Program
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white border border-gray-200 p-6">
-              <h3 className="font-serif text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
-                Anggaran & Manfaat
-              </h3>
-              <div className="space-y-4">
+            {/* Quick Info Grid */}
+            <div className="grid gap-4 md:grid-cols-3 mb-8">
+              <div className="flex items-start gap-3 p-4 border rounded-lg bg-card">
+                <Calendar className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-serif text-sm text-gray-500 mb-1">
-                    Total Anggaran
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
+                    Tanggal
                   </p>
-                  <p className="font-serif text-2xl font-bold text-gray-900">
-                    {selectedProgram.budget}
+                  <p className="font-serif text-sm font-medium">
+                    {formatDate(event.date)}
                   </p>
                 </div>
-                <div>
-                  <p className="font-serif text-sm text-gray-500 mb-1">
-                    Penerima Manfaat
-                  </p>
-                  <p className="font-serif text-2xl font-bold text-gray-900">
-                    {selectedProgram.beneficiaries}
-                  </p>
+              </div>
+
+              {event.location && (
+                <div className="flex items-start gap-3 p-4 border rounded-lg bg-card">
+                  <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
+                      Lokasi
+                    </p>
+                    <p className="font-serif text-sm font-medium">
+                      {event.location}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-serif text-sm text-gray-500 mb-1">
-                    Sumber Pendanaan
-                  </p>
-                  <p className="font-serif text-lg text-gray-900">
-                    {selectedProgram.fundingSource}
+              )}
+
+              {event.tutor && (
+                <div className="flex items-start gap-3 p-4 border rounded-lg bg-card">
+                  <User className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
+                      Tutor / Pembicara
+                    </p>
+                    <p className="font-serif text-sm font-medium">
+                      {event.tutor.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {event.tutor.type}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Image Gallery */}
+        {hasImages && (
+          <section className="border-y border-border bg-muted/20 py-16">
+            <div className="mx-auto max-w-6xl px-4 lg:px-6">
+              <div className="mb-6">
+                <h2 className="font-serif text-2xl font-semibold text-foreground">
+                  Galeri
+                </h2>
+                <p className="font-serif text-sm text-muted-foreground mt-2">
+                  Dokumentasi kegiatan program
+                </p>
+              </div>
+
+              {/* Main Image */}
+              <div className="mb-4">
+                <div className="relative aspect-video overflow-hidden rounded-lg bg-muted">
+                  <img
+                    src={images[selectedImage].url}
+                    alt={`${event.name} - ${selectedImage + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Thumbnails */}
+              {images.length > 1 && (
+                <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+                  {images.map((img, index) => (
+                    <button
+                      key={img.publicId || index}
+                      onClick={() => setSelectedImage(index)}
+                      className={`relative aspect-video overflow-hidden rounded border-2 transition-all ${
+                        selectedImage === index
+                          ? "border-primary"
+                          : "border-transparent hover:border-primary/50"
+                      }`}
+                    >
+                      <img
+                        src={img.url}
+                        alt={`Thumbnail ${index + 1}`}
+                        className="h-full w-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* No Images Placeholder */}
+        {!hasImages && (
+          <section className="border-y border-border bg-muted/20 py-16">
+            <div className="mx-auto max-w-6xl px-4 lg:px-6">
+              <div className="relative aspect-video overflow-hidden rounded-lg bg-muted flex items-center justify-center">
+                <div className="text-center">
+                  <ImageIcon className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <p className="font-serif text-muted-foreground">
+                    Belum ada dokumentasi untuk program ini
                   </p>
                 </div>
               </div>
             </div>
+          </section>
+        )}
 
-            <div className="bg-white border border-gray-200 p-6">
-              <h3 className="font-serif text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
-                Waktu & Lokasi
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="font-serif text-sm text-gray-500 mb-1">
-                    Tanggal Mulai
-                  </p>
-                  <p className="font-serif text-lg text-gray-900">
-                    {new Date(selectedProgram.startDate).toLocaleDateString(
-                      "id-ID",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )}
-                  </p>
+        {/* Community Info */}
+        <section className="bg-background py-16">
+          <div className="mx-auto max-w-6xl px-4 lg:px-6">
+            <Card className="border-border/70 bg-background/95">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <Users className="h-5 w-5 text-primary" />
+                  <div>
+                    <CardTitle className="font-serif text-lg text-foreground">
+                      Tentang Program
+                    </CardTitle>
+                    <CardDescription className="font-serif text-sm text-muted-foreground mt-1">
+                      Informasi lengkap mengenai program ini
+                    </CardDescription>
+                  </div>
                 </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Community */}
                 <div>
-                  <p className="font-serif text-sm text-gray-500 mb-1">
-                    Tanggal Selesai
+                  <p className="text-sm font-medium text-muted-foreground mb-2">
+                    Komunitas
                   </p>
-                  <p className="font-serif text-lg text-gray-900">
-                    {new Date(selectedProgram.endDate).toLocaleDateString(
-                      "id-ID",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )}
-                  </p>
+                  <Badge variant="outline" className="font-serif">
+                    {event.community || event.communityName}
+                  </Badge>
                 </div>
-                <div>
-                  <p className="font-serif text-sm text-gray-500 mb-1">
-                    Lokasi
-                  </p>
-                  <p className="font-serif text-lg text-gray-900">
-                    {selectedProgram.location}
-                  </p>
+
+                {/* Description */}
+                {event.description && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">
+                      Deskripsi
+                    </p>
+                    <p className="font-serif text-foreground leading-relaxed">
+                      {event.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Date & Time */}
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">
+                      Tanggal Pelaksanaan
+                    </p>
+                    <p className="font-serif text-foreground">
+                      {formatDate(event.date)}
+                    </p>
+                  </div>
+
+                  {event.location && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">
+                        Tempat
+                      </p>
+                      <p className="font-serif text-foreground">
+                        {event.location}
+                      </p>
+                    </div>
+                  )}
                 </div>
-              </div>
+
+                {/* Tutor Info */}
+                {event.tutor && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">
+                      Tutor / Pembicara
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-serif text-foreground font-medium">
+                        {event.tutor.name}
+                      </p>
+                      <Badge variant="secondary" className="text-xs">
+                        {event.tutor.type}
+                      </Badge>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="border-t border-border bg-muted/20 py-12">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 lg:px-6">
+            <div className="max-w-2xl font-serif text-sm text-muted-foreground">
+              Tertarik mengikuti program kami? Hubungi tim kami untuk informasi
+              lebih lanjut atau pendaftaran.
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" className="font-serif text-sm" asChild>
+                <Link to="/kontak">Hubungi Kami</Link>
+              </Button>
+              <Button
+                variant="link"
+                className="font-serif text-sm px-0"
+                asChild
+              >
+                <Link to="/program">← Kembali ke semua program</Link>
+              </Button>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Achievements */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <h2 className="font-serif text-2xl font-bold text-gray-900 mb-8">
-            Pencapaian Program
-          </h2>
-          <div className="bg-gray-50 border border-gray-200 p-8">
-            <ul className="space-y-4">
-              {selectedProgram.achievements.map((achievement, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="font-serif text-gray-900 mr-3">✓</span>
-                  <span className="font-serif text-gray-700 leading-relaxed">
-                    {achievement}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Back Button */}
-      <section className="bg-gray-50 py-12">
-        <div className="container mx-auto px-6 max-w-6xl text-center">
-          <Link
-            to="/program"
-            className="inline-block font-serif text-sm text-gray-900 border-b border-gray-900 hover:text-gray-600 hover:border-gray-600 transition-colors"
-          >
-            ← Kembali ke Semua Program
-          </Link>
-        </div>
-      </section>
+        </section>
+      </main>
 
       <Footer />
     </div>

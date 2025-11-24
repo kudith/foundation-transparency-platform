@@ -1,76 +1,91 @@
 import User from "../models/user.js";
-import { hashPassword } from "../utils/password.js";
-import { AppError } from "../utils/errorHandler.js";
+import mongoose from "mongoose";
+
+export const getAllUsers = async (filters = {}) => {
+  const query = {};
+
+  if (filters.communities) {
+    query.communities = { $in: [filters.communities] };
+  }
+
+  if (filters.roles) {
+    query.roles = { $in: [filters.roles] };
+  }
+
+  if (filters.statusPekerjaan) {
+    query.statusPekerjaan = filters.statusPekerjaan;
+  }
+
+  if (filters.kategoriUsia) {
+    query.kategoriUsia = filters.kategoriUsia;
+  }
+
+  if (filters.domisili) {
+    query.domisili = new RegExp(filters.domisili, "i");
+  }
+
+  return await User.find(query);
+};
+
+export const getUserById = async (id) => {
+  const user = await User.findById(id);
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
+  return user;
+};
 
 export const createUser = async (userData) => {
-  const { name, email, password } = userData;
-
-  // Check if user already exists
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    throw new AppError("User with this email already exists", 400);
-  }
-
-  // Hash password
-  const hashedPassword = await hashPassword(password);
-
-  // Create user
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
+  const user = new User({
+    _id: userData.id || new mongoose.Types.ObjectId().toString(),
+    name: userData.name,
+    communities: userData.communities || [],
+    roles: userData.roles || [],
+    statusPekerjaan: userData.statusPekerjaan,
+    kategoriUsia: userData.kategoriUsia,
+    domisili: userData.domisili,
+    createdAt: new Date(),
   });
 
-  return user.toJSON();
+  return await user.save();
 };
 
-export const updateUser = async (userId, updateData) => {
-  const { name, email, password } = updateData;
+export const updateUser = async (id, userData) => {
+  const updateData = {
+    communities: userData.communities,
+    roles: userData.roles,
+  };
 
-  // Find user
-  const user = await User.findById(userId);
+  if (userData.name) updateData.name = userData.name;
+  if (userData.statusPekerjaan)
+    updateData.statusPekerjaan = userData.statusPekerjaan;
+  if (userData.kategoriUsia) updateData.kategoriUsia = userData.kategoriUsia;
+  if (userData.domisili) updateData.domisili = userData.domisili;
+
+  const user = await User.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
+  });
+
   if (!user) {
-    throw new AppError("User not found", 404);
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
   }
 
-  // Check if email is being changed and already exists
-  if (email && email !== user.email) {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      throw new AppError("Email already in use", 400);
-    }
-    user.email = email;
-  }
-
-  // Update fields
-  if (name) user.name = name;
-
-  // Hash new password if provided
-  if (password) {
-    user.password = await hashPassword(password);
-  }
-
-  await user.save();
-  return user.toJSON();
+  return user;
 };
 
-export const getUserById = async (userId) => {
-  const user = await User.findById(userId);
+export const deleteUser = async (id) => {
+  const user = await User.findByIdAndDelete(id);
+
   if (!user) {
-    throw new AppError("User not found", 404);
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
   }
-  return user.toJSON();
-};
 
-export const getAllUsers = async (query = {}) => {
-  const users = await User.find(query).select("-password");
-  return users;
-};
-
-export const deleteUser = async (userId) => {
-  const user = await User.findByIdAndDelete(userId);
-  if (!user) {
-    throw new AppError("User not found", 404);
-  }
-  return { message: "User deleted successfully" };
+  return user;
 };

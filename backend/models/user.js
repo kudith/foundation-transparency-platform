@@ -1,41 +1,20 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, "Name is required"],
-      trim: true,
-      minlength: [2, "Name must be at least 2 characters"],
-      maxlength: [100, "Name must not exceed 100 characters"],
-    },
-    email: {
-      type: String,
-      required: [true, "Email is required"],
-      unique: true,
-      lowercase: true,
-      trim: true,
-      match: [/^\S+@\S+\.\S+$/, "Please provide a valid email"],
-    },
-    password: {
-      type: String,
-      required: [true, "Password is required"],
-      minlength: [6, "Password must be at least 6 characters"],
-      select: false, // Exclude password by default
-    },
+const UserSchema = new mongoose.Schema({
+  _id: { type: String, required: true }, // ID
+  name: { type: String, required: true },
+  communities: [{ type: String }], // Communities
+  roles: [{ type: String }], // Roles
+  statusPekerjaan: {
+    type: String,
+    enum: ["Pelajar", "Mahasiswa", "Pekerja", "Wirausaha", "Lainnya"],
   },
-  {
-    timestamps: true,
-    toJSON: {
-      transform: function (doc, ret) {
-        delete ret.password;
-        delete ret.__v;
-        return ret;
-      },
-    },
-  }
-);
+  kategoriUsia: {
+    type: String,
+    enum: ["<18", "18-25", "26-35", "36-45", ">45"],
+  },
+  domisili: { type: String },
+  createdAt: { type: Date, required: true },
+});
 
-const User = mongoose.model("User", userSchema);
-
-export default User;
+export default mongoose.model("User", UserSchema);

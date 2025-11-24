@@ -1,86 +1,46 @@
 import * as userService from "../services/user.js";
-import { createUserSchema, updateUserSchema } from "../validations/user.js";
-import { handleError, AppError } from "../utils/errorHandler.js";
 
-export const create = async (req, res) => {
+export const getAllUsers = async (req, res, next) => {
   try {
-    // Validate request body
-    const { error, value } = createUserSchema.validate(req.body);
-    if (error) {
-      throw new AppError(error.details[0].message, 400);
-    }
-
-    const user = await userService.createUser(value);
-
-    res.status(201).json({
-      success: true,
-      message: "User created successfully",
-      data: user,
-    });
+    const users = await userService.getAllUsers(req.query);
+    res.json({ success: true, data: users });
   } catch (error) {
-    handleError(error, req, res);
+    next(error);
   }
 };
 
-export const update = async (req, res) => {
+export const getUserById = async (req, res, next) => {
   try {
-    const { id } = req.params;
-
-    // Validate request body
-    const { error, value } = updateUserSchema.validate(req.body);
-    if (error) {
-      throw new AppError(error.details[0].message, 400);
-    }
-
-    const user = await userService.updateUser(id, value);
-
-    res.status(200).json({
-      success: true,
-      message: "User updated successfully",
-      data: user,
-    });
+    const user = await userService.getUserById(req.params.id);
+    res.json({ success: true, data: user });
   } catch (error) {
-    handleError(error, req, res);
+    next(error);
   }
 };
 
-export const getById = async (req, res) => {
+export const createUser = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const user = await userService.getUserById(id);
-
-    res.status(200).json({
-      success: true,
-      data: user,
-    });
+    const user = await userService.createUser(req.body);
+    res.status(201).json({ success: true, data: user });
   } catch (error) {
-    handleError(error, req, res);
+    next(error);
   }
 };
 
-export const getAll = async (req, res) => {
+export const updateUser = async (req, res, next) => {
   try {
-    const users = await userService.getAllUsers();
-
-    res.status(200).json({
-      success: true,
-      data: users,
-    });
+    const user = await userService.updateUser(req.params.id, req.body);
+    res.json({ success: true, data: user });
   } catch (error) {
-    handleError(error, req, res);
+    next(error);
   }
 };
 
-export const remove = async (req, res) => {
+export const deleteUser = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const result = await userService.deleteUser(id);
-
-    res.status(200).json({
-      success: true,
-      message: result.message,
-    });
+    await userService.deleteUser(req.params.id);
+    res.json({ success: true, message: "User deleted successfully" });
   } catch (error) {
-    handleError(error, req, res);
+    next(error);
   }
 };

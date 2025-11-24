@@ -1,14 +1,19 @@
 import express from "express";
-import * as userController from "../controllers/user.js";
 import { authenticate } from "../middlewares/auth.js";
+import {
+  getAllUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+} from "../controllers/user.js";
 
 const router = express.Router();
 
-// Protected routes - require authentication
-router.post("/", authenticate, userController.create);
-router.get("/", authenticate, userController.getAll);
-router.get("/:id", authenticate, userController.getById);
-router.put("/:id", authenticate, userController.update);
-router.delete("/:id", authenticate, userController.remove);
+router.get("/", getAllUsers);
+router.get("/:id", getUserById);
+router.post("/", createUser);
+router.put("/:id", updateUser);
+router.delete("/:id", deleteUser);
 
 export default router;

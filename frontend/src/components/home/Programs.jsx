@@ -1,27 +1,61 @@
-import { useEffect } from "react";
-import { useProgramStore } from "../../store/useProgramStore";
-import ProgramCard from "./ProgramCard";
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
+
+import { getAllEvents } from "@/services/eventService";
+import ProgramCard from "@/components/home/ProgramCard";
 
 const Programs = () => {
-  const { programs, loading, error, fetchPrograms } = useProgramStore();
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch programs on mount
   useEffect(() => {
-    if (programs.length === 0) {
-      fetchPrograms();
-    }
-  }, [fetchPrograms, programs.length]);
+    fetchEvents();
+  }, []);
 
-  // Show only first 3 programs on homepage
-  const featuredPrograms = programs.slice(0, 3);
+  const fetchEvents = async () => {
+    setLoading(true);
+    setError(null);
+
+    const result = await getAllEvents();
+
+    if (result.success) {
+      // Sort by date descending (newest first)
+      const sortedEvents = result.data.sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
+      setEvents(sortedEvents);
+    } else {
+      setError(result.error);
+    }
+
+    setLoading(false);
+  };
+
+  const featuredPrograms = events.slice(0, 3);
 
   if (loading) {
     return (
-      <section className="bg-white py-16 md:py-24">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <div className="text-center">
-            <p className="font-serif text-gray-600">Memuat program...</p>
-          </div>
+      <section className="bg-background py-16 md:py-24">
+        <div className="mx-auto max-w-4xl px-4 text-center lg:px-6">
+          <Card className="border-border/70 bg-background/95">
+            <CardContent className="flex flex-col items-center gap-3 py-10">
+              <Spinner className="size-6 text-primary" />
+              <p className="font-serif text-sm text-muted-foreground">
+                Memuat program unggulan...
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </section>
     );
@@ -29,45 +63,68 @@ const Programs = () => {
 
   if (error) {
     return (
-      <section className="bg-white py-16 md:py-24">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <div className="text-center">
-            <p className="font-serif text-red-600">
-              Gagal memuat program. Silakan coba lagi.
-            </p>
-          </div>
+      <section className="bg-background py-16 md:py-24">
+        <div className="mx-auto max-w-4xl px-4 text-center lg:px-6">
+          <Card className="border-destructive/40 bg-destructive/10">
+            <CardHeader>
+              <CardTitle className="font-serif text-foreground">
+                Terjadi Kesalahan
+              </CardTitle>
+              <CardDescription className="font-serif text-sm text-destructive">
+                Gagal memuat program. Silakan coba lagi beberapa saat.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="outline"
+                onClick={fetchEvents}
+                className="font-serif text-sm"
+              >
+                Muat Ulang
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </section>
     );
   }
 
+  if (featuredPrograms.length === 0) {
+    return null;
+  }
+
   return (
-    <section className="bg-white py-16 md:py-24">
-      <div className="container mx-auto px-6 max-w-6xl">
-        <div className="text-center mb-12">
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+    <section className="bg-background py-16 md:py-24">
+      <div className="mx-auto max-w-6xl px-4 lg:px-6">
+        <div className="mb-12 text-center">
+          <p className="font-serif text-sm uppercase tracking-[0.3em] text-primary/80">
             Program Kami
+          </p>
+          <h2 className="mt-4 font-serif text-3xl font-semibold text-foreground md:text-4xl">
+            Inisiatif Transparan untuk Dampak Nyata
           </h2>
-          <p className="font-serif text-gray-600 max-w-2xl mx-auto">
-            Setiap program kami dirancang dengan transparansi penuh, dari
-            perencanaan hingga pelaporan dampak.
+          <p className="mt-4 font-serif text-base text-muted-foreground md:text-lg">
+            Setiap program disertai laporan menyeluruh dan indikator
+            keberhasilan yang dapat dipantau secara berkala oleh publik.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {featuredPrograms.map((program) => (
-            <ProgramCard key={program.id} {...program} />
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {featuredPrograms.map((event) => (
+            <ProgramCard key={event._id} event={event} />
           ))}
         </div>
 
-        {programs.length > 3 && (
-          <div className="text-center mt-12">
-            <a
-              href="/program"
-              className="inline-block font-serif font-semibold px-8 py-3 bg-white text-gray-900 border-2 border-gray-900 hover:bg-gray-100 transition-colors"
+        {events.length > featuredPrograms.length && (
+          <div className="mt-12 text-center">
+            <Button
+              variant="outline"
+              size="lg"
+              asChild
+              className="font-serif text-sm"
             >
-              Lihat Semua Program
-            </a>
+              <Link to="/program">Lihat Semua Program</Link>
+            </Button>
           </div>
         )}
       </div>

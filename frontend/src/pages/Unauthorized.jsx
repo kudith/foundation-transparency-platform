@@ -11,7 +11,7 @@ const Unauthorized = () => {
         </div>
       </header>
 
-      <main className="flex-grow flex items-center justify-center bg-gray-50 py-32 mt-16">
+      <main className="grow flex items-center justify-center bg-gray-50 py-32 mt-16">
         <div className="container mx-auto px-6 max-w-2xl text-center">
           <div className="bg-white border border-gray-200 shadow-sm p-12">
             <h1 className="font-serif text-8xl md:text-9xl font-bold text-gray-900 mb-6">

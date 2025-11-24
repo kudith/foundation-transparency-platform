@@ -1,218 +1,269 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useProgramStore } from "../store/useProgramStore";
-import Header from "../components/home/Header";
-import Footer from "../components/home/Footer";
+import { useEffect, useMemo, useState } from "react";
+
+import ProgramCard from "@/components/home/ProgramCard";
+import Footer from "@/components/home/Footer";
+import Header from "@/components/home/Header";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
+import { getAllEvents } from "@/services/eventService";
+
+const communities = ["Nostracode", "Cordis Lingua"];
+
+const statuses = [
+  { value: "upcoming", label: "Akan Datang" },
+  { value: "today", label: "Hari Ini" },
+  { value: "past", label: "Selesai" },
+];
 
 const Programs = () => {
-  const { programs, loading, error, fetchPrograms, setFilters, clearFilters } =
-    useProgramStore();
-  const [activeCategory, setActiveCategory] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeCommunity, setActiveCommunity] = useState(null);
   const [activeStatus, setActiveStatus] = useState(null);
 
   useEffect(() => {
-    fetchPrograms();
-  }, [fetchPrograms]);
+    fetchEvents();
+  }, []);
 
-  const categories = [
-    "Pendidikan",
-    "Kesehatan",
-    "Ekonomi",
-    "Lingkungan",
-    "Infrastruktur",
-    "Teknologi",
-  ];
-  const statuses = ["Aktif", "Dalam Perencanaan"];
+  const fetchEvents = async () => {
+    setLoading(true);
+    setError(null);
 
-  const handleCategoryFilter = (category) => {
-    const newCategory = activeCategory === category ? null : category;
-    setActiveCategory(newCategory);
-    setFilters({ category: newCategory });
+    const result = await getAllEvents();
+
+    if (result.success) {
+      // Sort by date descending (newest first)
+      const sortedEvents = result.data.sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
+      setEvents(sortedEvents);
+    } else {
+      setError(result.error);
+    }
+
+    setLoading(false);
   };
 
-  const handleStatusFilter = (status) => {
-    const newStatus = activeStatus === status ? null : status;
-    setActiveStatus(newStatus);
-    setFilters({ status: newStatus });
+  // Get event status
+  const getEventStatus = (dateString) => {
+    const eventDate = new Date(dateString);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    eventDate.setHours(0, 0, 0, 0);
+
+    if (eventDate < today) {
+      return "past";
+    } else if (eventDate.toDateString() === today.toDateString()) {
+      return "today";
+    } else {
+      return "upcoming";
+    }
   };
 
-  const handleClearFilters = () => {
-    setActiveCategory(null);
-    setActiveStatus(null);
-    clearFilters();
-  };
+  const filteredPrograms = useMemo(() => {
+    let result = [...events];
 
-  const getFilteredPrograms = () => {
-    let filtered = [...programs];
-
-    if (activeCategory) {
-      filtered = filtered.filter((p) => p.category === activeCategory);
+    if (activeCommunity) {
+      result = result.filter(
+        (event) => (event.community || event.communityName) === activeCommunity
+      );
     }
 
     if (activeStatus) {
-      filtered = filtered.filter((p) => p.status === activeStatus);
+      result = result.filter(
+        (event) => getEventStatus(event.date) === activeStatus
+      );
     }
 
-    return filtered;
+    return result;
+  }, [events, activeCommunity, activeStatus]);
+
+  const handleCommunityFilter = (community) => {
+    const nextCommunity = activeCommunity === community ? null : community;
+    setActiveCommunity(nextCommunity);
   };
 
-  const filteredPrograms = getFilteredPrograms();
+  const handleStatusFilter = (status) => {
+    const nextStatus = activeStatus === status ? null : status;
+    setActiveStatus(nextStatus);
+  };
+
+  const handleClearFilters = () => {
+    setActiveCommunity(null);
+    setActiveStatus(null);
+  };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       <Header />
 
-      {/* Hero Section */}
-      <section className="bg-white py-24 md:py-32 mt-16">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <h1 className="font-serif text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Program Kami
-          </h1>
-          <p className="font-serif text-lg text-gray-600 max-w-3xl">
-            Jelajahi berbagai program sosial kami yang dirancang untuk
-            memberikan dampak nyata kepada masyarakat. Setiap program
-            dilaksanakan dengan transparansi penuh.
-          </p>
-        </div>
-      </section>
-
-      {/* Filters */}
-      <section className="bg-gray-50 py-8 border-b border-gray-200">
-        <div className="container mx-auto px-6 max-w-6xl">
-          <div className="mb-6">
-            <h3 className="font-serif text-sm font-semibold text-gray-900 mb-3">
-              Filter Kategori
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => handleCategoryFilter(category)}
-                  className={`font-serif text-sm px-4 py-2 border transition-colors ${
-                    activeCategory === category
-                      ? "bg-gray-900 text-white border-gray-900"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-gray-900"
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
+      <main className="flex flex-col flex-1">
+        {/* Hero Section */}
+        <section className="flex min-h-[60vh] flex-col items-center justify-center bg-background px-4 text-center md:px-6">
+          <div className="mx-auto max-w-4xl">
+            <p className="font-serif text-sm uppercase tracking-[0.3em] text-muted-foreground">
+              Transparansi Program
+            </p>
+            <h1 className="mt-6 font-serif text-4xl font-semibold text-foreground md:text-5xl">
+              Program Kami
+            </h1>
+            <p className="mt-6 font-serif text-lg text-muted-foreground md:text-xl">
+              Jelajahi berbagai program dan kegiatan yang kami jalankan dengan
+              akuntabilitas menyeluruh. Setiap program menampilkan informasi
+              lengkap, dokumentasi, serta detail pelaksanaan untuk menjaga
+              kepercayaan publik.
+            </p>
           </div>
+        </section>
 
-          <div className="mb-4">
-            <h3 className="font-serif text-sm font-semibold text-gray-900 mb-3">
-              Filter Status
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {statuses.map((status) => (
-                <button
-                  key={status}
-                  onClick={() => handleStatusFilter(status)}
-                  className={`font-serif text-sm px-4 py-2 border transition-colors ${
-                    activeStatus === status
-                      ? "bg-gray-900 text-white border-gray-900"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-gray-900"
-                  }`}
-                >
-                  {status}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {(activeCategory || activeStatus) && (
-            <button
-              onClick={handleClearFilters}
-              className="font-serif text-sm text-gray-600 hover:text-gray-900 underline"
-            >
-              Hapus semua filter
-            </button>
-          )}
-        </div>
-      </section>
-
-      {/* Programs Grid */}
-      <section className="bg-white py-16 flex-grow">
-        <div className="container mx-auto px-6 max-w-6xl">
-          {loading ? (
-            <div className="text-center py-20">
-              <p className="font-serif text-gray-600">Memuat program...</p>
-            </div>
-          ) : error ? (
-            <div className="text-center py-20">
-              <p className="font-serif text-red-600">{error}</p>
-            </div>
-          ) : filteredPrograms.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="font-serif text-gray-600">
-                Tidak ada program yang sesuai dengan filter.
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="mb-6">
-                <p className="font-serif text-gray-600">
-                  Menampilkan {filteredPrograms.length} program
-                </p>
-              </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredPrograms.map((program) => (
-                  <div
-                    key={program.id}
-                    className="bg-white border border-gray-200 shadow-sm p-6 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="font-serif text-xs text-gray-500 uppercase tracking-wide">
-                        {program.category}
-                      </span>
-                      <span
-                        className={`font-serif text-xs px-2 py-1 border ${
-                          program.status === "Aktif"
-                            ? "border-gray-900 text-gray-900"
-                            : "border-gray-400 text-gray-600"
-                        }`}
-                      >
-                        {program.status}
-                      </span>
-                    </div>
-
-                    <h3 className="font-serif text-xl font-bold text-gray-900 mb-3">
-                      {program.title}
-                    </h3>
-
-                    <p className="font-serif text-gray-600 mb-6 leading-relaxed line-clamp-3">
-                      {program.description}
-                    </p>
-
-                    <div className="space-y-2 mb-6">
-                      <div className="flex justify-between font-serif text-sm">
-                        <span className="text-gray-500">Anggaran:</span>
-                        <span className="text-gray-900 font-semibold">
-                          {program.budget}
-                        </span>
-                      </div>
-                      <div className="flex justify-between font-serif text-sm">
-                        <span className="text-gray-500">Penerima Manfaat:</span>
-                        <span className="text-gray-900 font-semibold">
-                          {program.beneficiaries}
-                        </span>
-                      </div>
-                    </div>
-
-                    <Link
-                      to={`/programs/${program.id}`}
-                      className="inline-block font-serif text-sm text-gray-900 border-b border-gray-900 hover:text-gray-600 hover:border-gray-600 transition-colors"
+        {/* Filter Section */}
+        <section className="border-y border-border bg-muted/20 py-12">
+          <div className="mx-auto max-w-6xl px-4 lg:px-6">
+            <div className="grid gap-8 md:grid-cols-2">
+              {/* Community Filter */}
+              <div>
+                <h3 className="font-serif text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  Filter Komunitas
+                </h3>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {communities.map((community) => (
+                    <Button
+                      key={community}
+                      variant="outline"
+                      className={cn(
+                        "border border-border/60 bg-background/80 px-4 py-2 font-serif text-sm text-muted-foreground hover:border-foreground hover:text-foreground transition-colors",
+                        activeCommunity === community &&
+                          "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+                      )}
+                      onClick={() => handleCommunityFilter(community)}
                     >
-                      Lihat Detail →
-                    </Link>
-                  </div>
-                ))}
+                      {community}
+                    </Button>
+                  ))}
+                </div>
               </div>
-            </>
-          )}
-        </div>
-      </section>
+
+              {/* Status Filter */}
+              <div>
+                <h3 className="font-serif text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  Filter Status
+                </h3>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {statuses.map((status) => (
+                    <Button
+                      key={status.value}
+                      variant="outline"
+                      className={cn(
+                        "border border-border/60 bg-background/80 px-4 py-2 font-serif text-sm text-muted-foreground hover:border-foreground hover:text-foreground transition-colors",
+                        activeStatus === status.value &&
+                          "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+                      )}
+                      onClick={() => handleStatusFilter(status.value)}
+                    >
+                      {status.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Clear Filters */}
+            {(activeCommunity || activeStatus) && (
+              <Button
+                variant="link"
+                className="mt-6 px-0 font-serif text-sm text-muted-foreground hover:text-foreground"
+                onClick={handleClearFilters}
+              >
+                Hapus semua filter
+              </Button>
+            )}
+          </div>
+        </section>
+
+        {/* Programs List Section */}
+        <section className="flex-1 bg-background py-16">
+          <div className="mx-auto max-w-6xl px-4 lg:px-6">
+            {loading && (
+              <Card className="border-border/70 bg-background/95">
+                <CardContent className="flex flex-col items-center gap-3 py-16">
+                  <Spinner className="size-6 text-primary" />
+                  <p className="font-serif text-sm text-muted-foreground">
+                    Memuat program...
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {!loading && error && (
+              <Card className="border-destructive/40 bg-destructive/10">
+                <CardHeader>
+                  <CardTitle className="font-serif text-foreground">
+                    Terjadi Kesalahan
+                  </CardTitle>
+                  <CardDescription className="font-serif text-sm text-destructive">
+                    {error}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    variant="outline"
+                    className="font-serif text-sm"
+                    onClick={fetchEvents}
+                  >
+                    Muat Ulang
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {!loading && !error && filteredPrograms.length === 0 && (
+              <Card className="border-border/70 bg-background/95">
+                <CardContent className="py-16 text-center">
+                  <p className="font-serif text-base text-muted-foreground mb-2">
+                    {events.length === 0
+                      ? "Belum ada program yang tersedia."
+                      : "Tidak ada program yang sesuai dengan filter saat ini."}
+                  </p>
+                  {events.length > 0 && (
+                    <Button
+                      variant="link"
+                      className="font-serif text-sm"
+                      onClick={handleClearFilters}
+                    >
+                      Hapus filter
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {!loading && !error && filteredPrograms.length > 0 && (
+              <>
+                <div className="mb-8">
+                  <p className="font-serif text-sm text-muted-foreground">
+                    Menampilkan {filteredPrograms.length} dari {events.length}{" "}
+                    program
+                  </p>
+                </div>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredPrograms.map((event) => (
+                    <ProgramCard key={event._id} event={event} />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+      </main>
 
       <Footer />
     </div>
