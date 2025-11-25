@@ -84,10 +84,9 @@ const Attendances = () => {
     const matchesType =
       typeFilter === "all" || attendance.attendee.type === typeFilter;
 
-    const attendanceEventId =
-      typeof attendance.eventID === "object"
-        ? attendance.eventID?._id
-        : attendance.eventID;
+    const attendanceEventId = typeof attendance.eventID === "object" 
+      ? attendance.eventID?._id 
+      : attendance.eventID;
     const matchesEvent =
       eventFilter === "all" || attendanceEventId === eventFilter;
 
@@ -270,10 +269,7 @@ const Attendances = () => {
           {loading && (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-4 p-4 border rounded-lg"
-                >
+                <div key={i} className="flex items-center gap-4 p-4 border rounded-lg">
                   <Skeleton className="h-12 w-12 rounded-full" />
                   <div className="space-y-2 flex-1">
                     <Skeleton className="h-4 w-48" />
@@ -289,7 +285,9 @@ const Attendances = () => {
           {!loading && error && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Gagal Memuat Data</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                Gagal Memuat Data
+              </h3>
               <p className="text-sm text-muted-foreground mb-4">{error}</p>
               <Button onClick={fetchData} variant="outline">
                 <RefreshCw className="h-4 w-4 mr-2" />
@@ -329,9 +327,7 @@ const Attendances = () => {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="font-semibold">
-                          {attendance.attendee.name}
-                        </p>
+                        <p className="font-semibold">{attendance.attendee.name}</p>
                         <Badge
                           variant="outline"
                           className={
@@ -403,3 +399,4 @@ const Attendances = () => {
 };
 
 export default Attendances;
+

@@ -69,3 +69,5 @@ export const deleteMultipleFromCloudinary = async (publicIds) => {
 
 export default cloudinary;
 
+
+

@@ -23,10 +23,7 @@ import {
   MapPin,
   Users,
 } from "lucide-react";
-import {
-  getAttendanceById,
-  deleteAttendance,
-} from "../../services/attendanceService";
+import { getAttendanceById, deleteAttendance } from "../../services/attendanceService";
 import { toast } from "sonner";
 import { useBreadcrumbStore } from "../../store/useBreadcrumbStore";
 
@@ -80,7 +77,9 @@ const AttendanceDetail = () => {
 
   const handleDelete = async () => {
     if (
-      !globalThis.confirm("Apakah Anda yakin ingin menghapus attendance ini?")
+      !globalThis.confirm(
+        "Apakah Anda yakin ingin menghapus attendance ini?"
+      )
     ) {
       return;
     }
@@ -249,44 +248,39 @@ const AttendanceDetail = () => {
           </div>
 
           {/* User Info (if Member) */}
-          {attendance?.attendee?.type === "Member" &&
-            attendance?.attendee?.userID && (
-              <>
-                <Separator />
-                <div>
-                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
-                    <Users className="h-4 w-4" />
-                    <span>Informasi Member</span>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">User ID:</span>
-                      <span className="font-mono text-xs">
-                        {typeof attendance.attendee.userID === "object"
-                          ? attendance.attendee.userID._id
-                          : attendance.attendee.userID}
-                      </span>
-                    </div>
-                    {typeof attendance.attendee.userID === "object" &&
-                      attendance.attendee.userID.email && (
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Email:</span>
-                          <span>{attendance.attendee.userID.email}</span>
-                        </div>
-                      )}
-                    {typeof attendance.attendee.userID === "object" &&
-                      attendance.attendee.userID.role && (
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Role:</span>
-                          <Badge variant="outline">
-                            {attendance.attendee.userID.role}
-                          </Badge>
-                        </div>
-                      )}
-                  </div>
+          {attendance?.attendee?.type === "Member" && attendance?.attendee?.userID && (
+            <>
+              <Separator />
+              <div>
+                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
+                  <Users className="h-4 w-4" />
+                  <span>Informasi Member</span>
                 </div>
-              </>
-            )}
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">User ID:</span>
+                    <span className="font-mono text-xs">
+                      {typeof attendance.attendee.userID === "object" 
+                        ? attendance.attendee.userID._id 
+                        : attendance.attendee.userID}
+                    </span>
+                  </div>
+                  {typeof attendance.attendee.userID === "object" && attendance.attendee.userID.email && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Email:</span>
+                      <span>{attendance.attendee.userID.email}</span>
+                    </div>
+                  )}
+                  {typeof attendance.attendee.userID === "object" && attendance.attendee.userID.role && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Role:</span>
+                      <Badge variant="outline">{attendance.attendee.userID.role}</Badge>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
 
           <Separator />
 
@@ -301,12 +295,9 @@ const AttendanceDetail = () => {
                 {typeof attendance.eventID === "object" ? (
                   <div className="space-y-3">
                     <div>
-                      <p className="font-semibold text-lg">
-                        {attendance.eventID.name}
-                      </p>
+                      <p className="font-semibold text-lg">{attendance.eventID.name}</p>
                       <Badge variant="outline" className="mt-1">
-                        {attendance.eventID.community ||
-                          attendance.eventID.communityName}
+                        {attendance.eventID.community || attendance.eventID.communityName}
                       </Badge>
                     </div>
                     <div className="text-sm text-muted-foreground">
@@ -324,9 +315,7 @@ const AttendanceDetail = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        navigate(`/admin/events/${attendance.eventID._id}`)
-                      }
+                      onClick={() => navigate(`/admin/events/${attendance.eventID._id}`)}
                     >
                       Lihat Event Detail
                     </Button>
@@ -346,3 +335,4 @@ const AttendanceDetail = () => {
 };
 
 export default AttendanceDetail;
+

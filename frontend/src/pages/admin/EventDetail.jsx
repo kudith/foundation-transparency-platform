@@ -24,11 +24,7 @@ import {
   X,
   ImageIcon,
 } from "lucide-react";
-import {
-  getEventById,
-  deleteEvent,
-  getEventStatus,
-} from "../../services/eventService";
+import { getEventById, deleteEvent, getEventStatus } from "../../services/eventService";
 import { toast } from "sonner";
 
 // Image Carousel Component
@@ -281,9 +277,7 @@ const EventDetail = () => {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
-              Event Tidak Ditemukan
-            </h3>
+            <h3 className="text-lg font-semibold mb-2">Event Tidak Ditemukan</h3>
             <p className="text-sm text-muted-foreground mb-4">{error}</p>
             <Button onClick={() => navigate("/admin/events")} variant="outline">
               Kembali ke Daftar Event
@@ -457,3 +451,4 @@ const EventDetail = () => {
 };
 
 export default EventDetail;
+

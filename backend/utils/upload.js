@@ -31,3 +31,5 @@ export const bufferToDataURI = (buffer, mimetype) => {
   return `data:${mimetype};base64,${base64}`;
 };
 
+
+

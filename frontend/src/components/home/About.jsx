@@ -10,10 +10,10 @@ import {
 } from "@/components/ui/card";
 
 const values = [
-  "Transparansi dalam setiap keputusan",
-  "Akuntabilitas kepada donatur dan publik",
-  "Integritas dalam pengelolaan dana",
-  "Dampak sosial yang terukur",
+  "Kebenaran dan integritas dalam setiap tindakan",
+  "Transparansi dan akuntabilitas penuh",
+  "Pemberdayaan melalui pendidikan berkualitas",
+  "Membangun komunitas yang inklusif dan berkelanjutan",
 ];
 
 const About = () => {
@@ -25,30 +25,34 @@ const About = () => {
             Tentang Kami
           </p>
           <h2 className="font-serif text-3xl font-semibold text-foreground md:text-4xl">
-            Membangun Kepercayaan Lewat Akuntabilitas yang Konsisten
+            Pelita yang Menerangi Perjalanan Pembelajaran Nusantara
           </h2>
           <p className="font-serif text-base leading-relaxed text-muted-foreground">
-            Yayasan Veritas Pelita Nusantara adalah organisasi nirlaba yang berfokus pada pemberdayaan masyarakat melalui pendidikan,
-            kesehatan, dan pembangunan berkelanjutan. Kami memastikan setiap program memiliki data pendukung,
-            laporan berkala, serta dokumentasi dampak yang dapat diakses publik.
+            <span className="font-semibold text-foreground">"Veritas"</span> berasal dari Bahasa Latin yang berarti kebenaran, 
+            mencerminkan komitmen kami terhadap integritas dan transparansi. Sementara{" "}
+            <span className="font-semibold text-foreground">"Pelita Nusantara"</span> melambangkan cahaya 
+            yang menerangi seluruh nusantara, menandakan dedikasi kami untuk membawa pencerahan dan kemajuan 
+            kepada masyarakat Indonesia.
           </p>
           <p className="font-serif text-base leading-relaxed text-muted-foreground">
-            Dengan prinsip transparansi penuh, kami menyiapkan pelaporan terstandarisasi agar donatur dan publik dapat menilai kontribusi mereka secara real-time,
-            serta memantau keberlanjutan dari setiap inisiatif.
+            Kami memberdayakan komunitas melalui pembelajaran bahasa Inggris di{" "}
+            <span className="font-semibold text-foreground">CORDIS LINGUA</span> dan pengembangan 
+            keterampilan coding di <span className="font-semibold text-foreground">NOSTRACODE</span>. 
+            Bersama, kami membangun fondasi yang kuat untuk masa depan yang lebih cerah.
           </p>
 
           <Button variant="outline" asChild className="font-serif text-sm">
-            <Link to="/tentang">Pelajari Profil Yayasan</Link>
+            <Link to="/tentang">Pelajari Visi & Misi Lengkap</Link>
           </Button>
         </div>
 
         <Card className="border-border/70 bg-background/80 backdrop-blur">
           <CardHeader>
             <CardTitle className="font-serif text-xl text-foreground">
-              Nilai Kami
+              Nilai-Nilai Kami
             </CardTitle>
             <CardDescription className="font-serif text-sm text-muted-foreground">
-              Prinsip yang menuntun kami dalam merancang, menjalankan, dan mengevaluasi seluruh program.
+              Prinsip fundamental yang menjadi landasan setiap program dan inisiatif kami.
             </CardDescription>
           </CardHeader>
           <CardContent>

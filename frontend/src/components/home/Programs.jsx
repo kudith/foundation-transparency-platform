@@ -98,14 +98,14 @@ const Programs = () => {
       <div className="mx-auto max-w-6xl px-4 lg:px-6">
         <div className="mb-12 text-center">
           <p className="font-serif text-sm uppercase tracking-[0.3em] text-primary/80">
-            Program Kami
+            Program & Kegiatan
           </p>
           <h2 className="mt-4 font-serif text-3xl font-semibold text-foreground md:text-4xl">
-            Inisiatif Transparan untuk Dampak Nyata
+            Memberdayakan Komunitas Melalui Pembelajaran
           </h2>
           <p className="mt-4 font-serif text-base text-muted-foreground md:text-lg">
-            Setiap program disertai laporan menyeluruh dan indikator
-            keberhasilan yang dapat dipantau secara berkala oleh publik.
+            Dari pembelajaran bahasa hingga pengembangan teknologi, setiap program 
+            dirancang untuk melengkapi individu dengan keterampilan yang mereka butuhkan.
           </p>
         </div>
 

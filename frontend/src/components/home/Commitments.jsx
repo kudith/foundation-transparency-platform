@@ -1,23 +1,23 @@
 const commitments = [
   {
-    title: "Laporan Keuangan Terbuka",
+    title: "Menjadi Pelopor Pemberdayaan",
     description:
-      "Akses publik diperbarui setiap triwulan dengan format yang mudah diverifikasi.",
+      "Membuka jalan bagi komunitas inovatif yang berbasis pada kejujuran dan integritas.",
   },
   {
-    title: "Audit Independen",
+    title: "Membimbing dengan Sepenuh Hati",
     description:
-      "Diawasi auditor eksternal bersertifikasi untuk memastikan kepatuhan penuh.",
+      "Memberikan dukungan dan sumber daya untuk pertumbuhan dan kemandirian setiap individu.",
   },
   {
-    title: "Dasbor Program",
+    title: "Membangun Fondasi Kuat",
     description:
-      "Indikator capaian tersedia secara real-time untuk setiap program aktif.",
+      "Bersinergi membangun komunitas yang berkembang dan memperluas dampak positif di nusantara.",
   },
   {
-    title: "Pelibatan Publik",
+    title: "Menjunjung Transparansi",
     description:
-      "Forum transparansi rutin bersama pemangku kepentingan di seluruh daerah.",
+      "Menerapkan nilai kebenaran, integritas, dan transparansi dalam setiap aspek operasional.",
   },
 ];
 
@@ -43,16 +43,15 @@ const Commitments = () => {
       <div className="mx-auto max-w-5xl px-4 lg:px-6">
         <div className="flex flex-col items-center text-center mb-12">
           <p className="font-serif text-sm uppercase tracking-[0.3em] text-primary/80">
-            Komitmen Utama
+            Misi Kami
           </p>
           <h2 className="mt-3 font-serif text-3xl font-semibold text-foreground md:text-4xl">
-            Transparansi yang Konsisten di Setiap Langkah
+            Empat Pilar Pemberdayaan Komunitas
           </h2>
           <p className="mt-4 font-serif text-base leading-relaxed text-muted-foreground max-w-2xl">
-            Setiap proses pengambilan keputusan, pelaporan keuangan, dan
-            evaluasi program selalu dibuka untuk publik. Komitmen berikut
-            menjadi dasar bagi kami dalam menjaga kepercayaan dan memastikan
-            akuntabilitas berkelanjutan.
+            Misi kami adalah merangkul, membimbing, dan melengkapi setiap individu 
+            untuk membentuk pribadi dengan jiwa yang siap berjuang untuk hidup dan 
+            impian mereka. Empat pilar ini menjadi panduan dalam setiap langkah kami.
           </p>
         </div>
         <div className="grid gap-8 sm:grid-cols-2">

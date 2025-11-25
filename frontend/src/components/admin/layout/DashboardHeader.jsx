@@ -78,12 +78,12 @@ const DashboardHeader = ({ onMenuToggle }) => {
         // Handle dynamic routes (dengan ID)
         // Skip segment yang terlihat seperti MongoDB ID
         const isMongoId = /^[a-f\d]{24}$/i.test(segment);
-
+        
         if (isMongoId) {
           // Skip MongoDB IDs in breadcrumb
           return;
         }
-
+        
         // Handle special segments
         if (segment === "new") {
           breadcrumbs.push({
@@ -116,7 +116,7 @@ const DashboardHeader = ({ onMenuToggle }) => {
     const hasId = pathnames.some((segment) => /^[a-f\d]{24}$/i.test(segment));
     const lastSegment = pathnames[pathnames.length - 1];
     const isEditOrNew = lastSegment === "edit" || lastSegment === "new";
-
+    
     if (hasId && !isEditOrNew && breadcrumbs.length > 0) {
       // Add "Detail" for detail views
       breadcrumbs.push({
@@ -223,3 +223,4 @@ DashboardHeader.propTypes = {
 };
 
 export default DashboardHeader;
+

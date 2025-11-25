@@ -11,24 +11,24 @@ import {
 
 const metrics = [
   {
-    label: "Anggaran Terealisasi",
-    value: "92%",
-    description: "Persentase belanja dari total komitmen keuangan tahun berjalan.",
+    label: "Komunitas Aktif",
+    value: "2",
+    description: "CORDIS LINGUA dan NOSTRACODE yang memberdayakan individu.",
   },
   {
-    label: "Program Aktif",
-    value: "38",
-    description: "Inisiatif yang saat ini berjalan dan menerima evaluasi berkala.",
+    label: "Legalitas",
+    value: "Resmi",
+    description: "Disahkan oleh Kemenkumham dan terverifikasi internasional.",
   },
   {
-    label: "Penerima Manfaat",
-    value: "58.200+",
-    description: "Individu dan komunitas yang telah menerima dampak secara langsung.",
+    label: "Transparansi",
+    value: "100%",
+    description: "Laporan keuangan dan dampak program terbuka untuk publik.",
   },
   {
-    label: "Rasio Operasional",
-    value: "14%",
-    description: "Porsi biaya operasional terhadap total anggaran transparansi.",
+    label: "Fokus",
+    value: "Pendidikan",
+    description: "Bahasa Inggris dan teknologi untuk masa depan yang lebih cerah.",
   },
 ];
 
@@ -38,18 +38,18 @@ const TransparencyReport = () => {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 md:grid-cols-[1.1fr_0.9fr] lg:px-6">
         <div className="space-y-6">
           <p className="font-serif text-sm uppercase tracking-[0.3em] text-primary/80">
-            Laporan Transparansi
+            Transparansi & Akuntabilitas
           </p>
           <h2 className="font-serif text-3xl font-semibold text-foreground md:text-4xl">
-            Ringkasan Kinerja dan Akuntabilitas 2025
+            Komitmen Kami Terhadap Keterbukaan
           </h2>
           <p className="font-serif text-base leading-relaxed text-muted-foreground">
-            Kami menyajikan laporan terperinci mengenai alokasi anggaran, capaian program,
-            dan hasil audit independen. Setiap data dapat diunduh dan diverifikasi secara terbuka
-            untuk memastikan kepercayaan publik terhadap yayasan.
+            Sebagai yayasan yang menjunjung tinggi nilai <span className="font-semibold text-foreground">Veritas</span> (kebenaran), 
+            kami berkomitmen untuk transparansi penuh dalam setiap aspek operasional. Dari legalitas hingga 
+            pelaporan program, semua informasi tersedia untuk publik.
           </p>
           <Button variant="outline" asChild className="font-serif text-sm">
-            <Link to="/laporan">Unduh Laporan Lengkap</Link>
+            <Link to="/laporan">Lihat Laporan & Legalitas</Link>
           </Button>
         </div>
 

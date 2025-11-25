@@ -25,22 +25,22 @@ const Statistics = () => {
     {
       label: "Total Program",
       value: statistics.totalPrograms,
-      description: "Inisiatif transparansi yang dijalankan sepanjang tahun ini.",
+      description: "Kegiatan pemberdayaan yang telah kami selenggarakan.",
     },
     {
       label: "Program Aktif",
       value: statistics.activePrograms,
-      description: "Program yang sedang berjalan dan menerima monitoring rutin.",
+      description: "Program yang sedang berjalan untuk memberdayakan komunitas.",
     },
     {
       label: "Total Anggaran",
       value: `Rp ${(statistics.totalBudget / 1_000_000_000).toFixed(1)}M`,
-      description: "Nilai akumulasi dana yang telah dialokasikan untuk program.",
+      description: "Dana yang dialokasikan untuk pengembangan komunitas.",
     },
     {
       label: "Penerima Manfaat",
       value: statistics.totalBeneficiaries.toLocaleString("id-ID"),
-      description: "Individu dan komunitas yang merasakan dampak nyata.",
+      description: "Individu yang telah bergabung dan berkembang bersama kami.",
     },
   ];
 
@@ -52,10 +52,11 @@ const Statistics = () => {
             Dampak Kami
           </p>
           <h2 className="mt-4 font-serif text-3xl font-semibold text-background md:text-4xl">
-            Data yang Menjaga Kepercayaan Publik
+            Pertumbuhan Melalui Pemberdayaan Berkelanjutan
           </h2>
           <p className="mt-4 font-serif text-base text-background/70">
-            Setiap angka adalah representasi dari komitmen kami menjaga akuntabilitas dan transparansi kepada para pemangku kepentingan.
+            Setiap angka mencerminkan perjalanan individu yang kami rangkul, bimbing, 
+            dan lengkapi untuk mencapai potensi terbaik mereka.
           </p>
         </div>
 

@@ -149,27 +149,16 @@ const ReportGenerator = () => {
 
     // Add filters based on type
     const reportConfig = REPORT_TYPES[formData.type];
-
-    if (
-      reportConfig.requiredFilters.includes("start_date") &&
-      formData.start_date
-    ) {
-      reportData.filters.start_date = new Date(
-        formData.start_date
-      ).toISOString();
+    
+    if (reportConfig.requiredFilters.includes("start_date") && formData.start_date) {
+      reportData.filters.start_date = new Date(formData.start_date).toISOString();
     }
 
-    if (
-      reportConfig.requiredFilters.includes("end_date") &&
-      formData.end_date
-    ) {
+    if (reportConfig.requiredFilters.includes("end_date") && formData.end_date) {
       reportData.filters.end_date = new Date(formData.end_date).toISOString();
     }
 
-    if (
-      reportConfig.requiredFilters.includes("community_name") &&
-      formData.community_name
-    ) {
+    if (reportConfig.requiredFilters.includes("community_name") && formData.community_name) {
       reportData.filters.community_name = formData.community_name;
     }
 
@@ -188,9 +177,7 @@ const ReportGenerator = () => {
   };
 
   // Get required filters for selected type
-  const selectedReportConfig = formData.type
-    ? REPORT_TYPES[formData.type]
-    : null;
+  const selectedReportConfig = formData.type ? REPORT_TYPES[formData.type] : null;
 
   return (
     <div className="space-y-6">
@@ -219,10 +206,9 @@ const ReportGenerator = () => {
         <div className="text-sm text-blue-900">
           <p className="font-medium mb-1">Catatan Penting</p>
           <p>
-            Report akan dibuat dengan status <strong>"pending"</strong> dan
-            otomatis diproses oleh worker backend. Status akan berubah menjadi
-            "processing" → "completed" atau "failed" secara otomatis. Anda tidak
-            perlu mengatur status secara manual.
+            Report akan dibuat dengan status <strong>"pending"</strong> dan otomatis diproses oleh worker backend. 
+            Status akan berubah menjadi "processing" → "completed" atau "failed" secara otomatis. 
+            Anda tidak perlu mengatur status secara manual.
           </p>
         </div>
       </div>
@@ -301,9 +287,7 @@ const ReportGenerator = () => {
               </div>
 
               {/* Community Selection */}
-              {selectedReportConfig?.requiredFilters.includes(
-                "community_name"
-              ) && (
+              {selectedReportConfig?.requiredFilters.includes("community_name") && (
                 <div className="space-y-2">
                   <Label htmlFor="community_name">
                     Komunitas <span className="text-destructive">*</span>
@@ -316,9 +300,7 @@ const ReportGenerator = () => {
                   >
                     <SelectTrigger
                       id="community_name"
-                      className={
-                        errors.community_name ? "border-destructive" : ""
-                      }
+                      className={errors.community_name ? "border-destructive" : ""}
                     >
                       <SelectValue placeholder="Pilih komunitas" />
                     </SelectTrigger>
@@ -327,9 +309,7 @@ const ReportGenerator = () => {
                         <SelectItem value="all">Semua Komunitas</SelectItem>
                       )}
                       <SelectItem value="Nostracode">Nostracode</SelectItem>
-                      <SelectItem value="Cordis Lingua">
-                        Cordis Lingua
-                      </SelectItem>
+                      <SelectItem value="Cordis Lingua">Cordis Lingua</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.community_name && (
@@ -367,8 +347,7 @@ const ReportGenerator = () => {
                   {/* End Date */}
                   <div className="space-y-2">
                     <Label htmlFor="end_date">
-                      Tanggal Selesai{" "}
-                      <span className="text-destructive">*</span>
+                      Tanggal Selesai <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="end_date"
@@ -422,3 +401,4 @@ const ReportGenerator = () => {
 };
 
 export default ReportGenerator;
+
