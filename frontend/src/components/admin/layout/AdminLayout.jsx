@@ -9,6 +9,12 @@ import EventForm from "../../../pages/admin/EventForm";
 import Attendances from "../../../pages/admin/Attendances";
 import AttendanceDetail from "../../../pages/admin/AttendanceDetail";
 import AttendanceForm from "../../../pages/admin/AttendanceForm";
+import Donations from "../../../pages/admin/Donations";
+import DonationDetail from "../../../pages/admin/DonationDetail";
+import DonationForm from "../../../pages/admin/DonationForm";
+import Expenses from "../../../pages/admin/Expenses";
+import ExpenseDetail from "../../../pages/admin/ExpenseDetail";
+import ExpenseForm from "../../../pages/admin/ExpenseForm";
 import Reports from "../../../pages/admin/Reports";
 import ReportGenerator from "../../../pages/admin/ReportGenerator";
 import { cn } from "../../../lib/utils";
@@ -72,13 +78,23 @@ const AdminLayout = () => {
             <Route path="/attendance/:id" element={<AttendanceDetail />} />
             <Route path="/attendance/:id/edit" element={<AttendanceForm />} />
 
+            {/* Donations routes */}
+            <Route path="/donations" element={<Donations />} />
+            <Route path="/donations/new" element={<DonationForm />} />
+            <Route path="/donations/:id" element={<DonationDetail />} />
+            <Route path="/donations/:id/edit" element={<DonationForm />} />
+
+            {/* Expenses routes */}
+            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/expenses/new" element={<ExpenseForm />} />
+            <Route path="/expenses/:id" element={<ExpenseDetail />} />
+            <Route path="/expenses/:id/edit" element={<ExpenseForm />} />
+
             {/* Reports routes */}
             <Route path="/reports" element={<Reports />} />
             <Route path="/reports/generate" element={<ReportGenerator />} />
 
             {/* Tambahkan route baru di sini dengan mudah */}
-            {/* <Route path="/donations" element={<Donations />} /> */}
-            {/* <Route path="/expenses" element={<Expenses />} /> */}
           </Routes>
         </main>
       </div>

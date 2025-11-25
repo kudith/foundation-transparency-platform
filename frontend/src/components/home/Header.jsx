@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { to: "/tentang", label: "Tentang Kami" },
   { to: "/program", label: "Program" },
+  { to: "/laporan", label: "Laporan" },
   { to: "/kontak", label: "Kontak" },
 ];
 

@@ -5,6 +5,7 @@ import About from "./About";
 import Programs from "./Programs";
 import ProgramDetail from "./ProgramDetail";
 import Contact from "./Contact";
+import PublicReports from "./PublicReports";
 import NotFound from "./NotFound";
 import Forbidden from "./Forbidden";
 import Unauthorized from "./Unauthorized";
@@ -12,7 +13,6 @@ import ServerError from "./ServerError";
 import ServiceUnavailable from "./ServiceUnavailable";
 import AdminLogin from "./admin/Login";
 import AdminLayout from "../components/admin/layout/AdminLayout";
-import Dashboard from "./admin/Dashboard";
 import ProtectedRoute from "../components/admin/ProtectedRoute";
 import "../styles/App.css";
 
@@ -27,6 +27,7 @@ function App() {
       <Route path="/program" element={<Programs />} />
       <Route path="/program/:id" element={<ProgramDetail />} />
       <Route path="/kontak" element={<Contact />} />
+      <Route path="/laporan" element={<PublicReports />} />
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />
