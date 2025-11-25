@@ -14,8 +14,8 @@ const router = express.Router();
 router.get("/", getAllDonations);
 router.get("/stats", getDonationStats);
 router.get("/:id", getDonationById);
-router.post("/", createDonation);
-router.put("/:id", updateDonation);
-router.delete("/:id", deleteDonation);
+router.post("/", authenticate, createDonation);
+router.put("/:id", authenticate, updateDonation);
+router.delete("/:id", authenticate, deleteDonation);
 
 export default router;

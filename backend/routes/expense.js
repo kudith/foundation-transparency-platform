@@ -14,8 +14,8 @@ const router = express.Router();
 router.get("/", getAllExpenses);
 router.get("/stats", getExpenseStats);
 router.get("/:id", getExpenseById);
-router.post("/", createExpense);
-router.put("/:id", updateExpense);
-router.delete("/:id", deleteExpense);
+router.post("/", authenticate, createExpense);
+router.put("/:id", authenticate, updateExpense);
+router.delete("/:id", authenticate, deleteExpense);
 
 export default router;
