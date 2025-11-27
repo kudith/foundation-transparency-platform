@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/foundation-transparency-platform/",
+  base: "/",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
