@@ -1,11 +1,7 @@
 import Event from "../models/event.js";
 import User from "../models/user.js";
 import mongoose from "mongoose";
-import {
-  uploadToCloudinary,
-  deleteMultipleFromCloudinary,
-} from "../config/cloudinary.js";
-import { bufferToDataURI } from "../utils/upload.js";
+import { createImageJob, getImageJobsByIds, deleteImageJob } from "./imageJob.js";
 
 export const getAllEvents = async (filters = {}) => {
   const query = {};
@@ -21,7 +17,30 @@ export const getAllEvents = async (filters = {}) => {
     };
   }
 
-  return await Event.find(query).sort({ date: -1 });
+  const events = await Event.find(query).sort({ date: -1 });
+  
+  // Populate images from image jobs
+  const eventsWithImages = await Promise.all(
+    events.map(async (event) => {
+      const eventObj = event.toObject();
+      if (eventObj.imageJobIds && eventObj.imageJobIds.length > 0) {
+        const imageJobs = await getImageJobsByIds(eventObj.imageJobIds);
+        eventObj.images = imageJobs
+          .filter((job) => job.status === "COMPLETED") // UPPERCASE
+          .map((job) => ({
+            id: job._id,
+            publicId: job._id.toString(), // For frontend compatibility
+            url: job.outputImageURL,
+            status: job.status,
+          }));
+      } else {
+        eventObj.images = [];
+      }
+      return eventObj;
+    })
+  );
+
+  return eventsWithImages;
 };
 
 export const getEventById = async (id) => {
@@ -31,7 +50,24 @@ export const getEventById = async (id) => {
     error.statusCode = 404;
     throw error;
   }
-  return event;
+
+  const eventObj = event.toObject();
+  
+  // Populate images from image jobs
+  if (eventObj.imageJobIds && eventObj.imageJobIds.length > 0) {
+    const imageJobs = await getImageJobsByIds(eventObj.imageJobIds);
+    eventObj.images = imageJobs.map((job) => ({
+      id: job._id,
+      publicId: job._id.toString(), // For frontend compatibility (imageJobId)
+      url: job.outputImageURL || job.sourceImageURL,
+      status: job.status,
+      errorMsg: job.errorMsg,
+    }));
+  } else {
+    eventObj.images = [];
+  }
+
+  return eventObj;
 };
 
 export const createEvent = async (eventData, files = []) => {
@@ -48,18 +84,10 @@ export const createEvent = async (eventData, files = []) => {
     tutorName = user.name;
   }
 
-  // Upload images to Cloudinary
-  const uploadedImages = [];
-  if (files && files.length > 0) {
-    for (const file of files) {
-      const dataURI = bufferToDataURI(file.buffer, file.mimetype);
-      const uploadResult = await uploadToCloudinary(dataURI, "events");
-      uploadedImages.push(uploadResult);
-    }
-  }
-
+  // Create event first
+  const eventId = new mongoose.Types.ObjectId().toString();
   const event = new Event({
-    _id: new mongoose.Types.ObjectId().toString(),
+    _id: eventId,
     name: eventData.name,
     community: eventData.community,
     date: eventData.date,
@@ -68,14 +96,42 @@ export const createEvent = async (eventData, files = []) => {
       userID: eventData.tutor.userID,
       name: tutorName,
     },
-    images: uploadedImages,
+    imageJobIds: [],
     description: eventData.description,
     location: eventData.location,
     createdAt: new Date(),
     updatedAt: new Date(),
   });
 
-  return await event.save();
+  await event.save();
+
+  // Create image jobs for uploaded files
+  const imageJobIds = [];
+  if (files && files.length > 0) {
+    for (const file of files) {
+      try {
+        const imageJob = await createImageJob(
+          {
+            entityType: "event",
+            entityId: eventId,
+          },
+          file.buffer,
+          file.mimetype,
+          file.originalname
+        );
+        imageJobIds.push(imageJob._id.toString());
+      } catch (error) {
+        console.error("Error creating image job:", error);
+        // Continue with other files even if one fails
+      }
+    }
+
+    // Update event with imageJobIds
+    event.imageJobIds = imageJobIds;
+    await event.save();
+  }
+
+  return event;
 };
 
 export const updateEvent = async (id, eventData, files = []) => {
@@ -89,21 +145,6 @@ export const updateEvent = async (id, eventData, files = []) => {
 
     console.log("Update event data received:", eventData);
     console.log("Files received:", files?.length || 0);
-
-    // Upload new images if provided
-    const uploadedImages = [];
-    if (files && files.length > 0) {
-      for (const file of files) {
-        try {
-          const dataURI = bufferToDataURI(file.buffer, file.mimetype);
-          const uploadResult = await uploadToCloudinary(dataURI, "events");
-          uploadedImages.push(uploadResult);
-        } catch (uploadError) {
-          console.error("Error uploading image:", uploadError);
-          throw new Error(`Failed to upload image: ${uploadError.message}`);
-        }
-      }
-    }
 
     const updateData = {
       updatedAt: new Date(),
@@ -147,11 +188,31 @@ export const updateEvent = async (id, eventData, files = []) => {
       };
     }
 
-    // Update images - merge existing with new
-    if (uploadedImages.length > 0) {
-      updateData.images = [
-        ...(existingEvent.images || []),
-        ...uploadedImages,
+    // Create image jobs for new uploaded files
+    const newImageJobIds = [];
+    if (files && files.length > 0) {
+      for (const file of files) {
+        try {
+          const imageJob = await createImageJob(
+            {
+              entityType: "event",
+              entityId: id,
+            },
+            file.buffer,
+            file.mimetype,
+            file.originalname
+          );
+          newImageJobIds.push(imageJob._id.toString());
+        } catch (uploadError) {
+          console.error("Error creating image job:", uploadError);
+          // Continue with other files
+        }
+      }
+
+      // Merge existing imageJobIds with new ones
+      updateData.imageJobIds = [
+        ...(existingEvent.imageJobIds || []),
+        ...newImageJobIds,
       ];
     }
 
@@ -175,7 +236,7 @@ export const updateEvent = async (id, eventData, files = []) => {
   }
 };
 
-export const deleteEventImage = async (eventId, publicId) => {
+export const deleteEventImage = async (eventId, imageJobId) => {
   const event = await Event.findById(eventId);
   if (!event) {
     const error = new Error("Event not found");
@@ -183,11 +244,11 @@ export const deleteEventImage = async (eventId, publicId) => {
     throw error;
   }
 
-  // Delete from Cloudinary
-  await deleteMultipleFromCloudinary([publicId]);
+  // Delete image job
+  await deleteImageJob(imageJobId);
 
-  // Remove from event images array
-  event.images = event.images.filter((img) => img.publicId !== publicId);
+  // Remove from event imageJobIds array
+  event.imageJobIds = event.imageJobIds.filter((id) => id !== imageJobId);
   event.updatedAt = new Date();
   await event.save();
 
@@ -203,10 +264,16 @@ export const deleteEvent = async (id) => {
     throw error;
   }
 
-  // Delete all images from Cloudinary
-  if (event.images && event.images.length > 0) {
-    const publicIds = event.images.map((img) => img.publicId);
-    await deleteMultipleFromCloudinary(publicIds);
+  // Delete all image jobs
+  if (event.imageJobIds && event.imageJobIds.length > 0) {
+    for (const jobId of event.imageJobIds) {
+      try {
+        await deleteImageJob(jobId);
+      } catch (error) {
+        console.error(`Error deleting image job ${jobId}:`, error);
+        // Continue deleting other jobs
+      }
+    }
   }
 
   await Event.findByIdAndDelete(id);

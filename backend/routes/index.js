@@ -7,6 +7,7 @@ import attendanceRoutes from "./attendance.js";
 import donationRoutes from "./donation.js";
 import reportRoutes from "./report.js";
 import expenseRoutes from "./expense.js";
+import imageJobRoutes from "./imageJob.js";
 
 const router = express.Router();
 
@@ -18,5 +19,6 @@ router.use("/attendances", attendanceRoutes);
 router.use("/donations", donationRoutes);
 router.use("/expenses", expenseRoutes);
 router.use("/reports", reportRoutes);
+router.use("/image-jobs", imageJobRoutes);
 
 export default router;
