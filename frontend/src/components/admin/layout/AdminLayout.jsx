@@ -17,6 +17,9 @@ import ExpenseDetail from "../../../pages/admin/ExpenseDetail";
 import ExpenseForm from "../../../pages/admin/ExpenseForm";
 import Reports from "../../../pages/admin/Reports";
 import ReportGenerator from "../../../pages/admin/ReportGenerator";
+import Users from "../../../pages/admin/Users";
+import UserDetail from "../../../pages/admin/UserDetail";
+import UserForm from "../../../pages/admin/UserForm";
 import { cn } from "../../../lib/utils";
 
 const AdminLayout = () => {
@@ -93,6 +96,12 @@ const AdminLayout = () => {
             {/* Reports routes */}
             <Route path="/reports" element={<Reports />} />
             <Route path="/reports/generate" element={<ReportGenerator />} />
+
+            {/* Users routes */}
+            <Route path="/users" element={<Users />} />
+            <Route path="/users/new" element={<UserForm />} />
+            <Route path="/users/:id" element={<UserDetail />} />
+            <Route path="/users/:id/edit" element={<UserForm />} />
 
             {/* Tambahkan route baru di sini dengan mudah */}
           </Routes>

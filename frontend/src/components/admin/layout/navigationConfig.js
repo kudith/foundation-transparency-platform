@@ -1,4 +1,4 @@
-import { Home, Calendar, Users, DollarSign, FileText, BarChart3 } from "lucide-react";
+import { Home, Calendar, Users, DollarSign, FileText, BarChart3, UserCircle } from "lucide-react";
 
 /**
  * Navigation configuration - mudah untuk menambah menu baru
@@ -53,6 +53,12 @@ export const navigationItems = [
     href: "/admin/reports",
     icon: BarChart3,
     description: "Laporan dan analitik"
+  },
+  {
+    title: "Users",
+    href: "/admin/users",
+    icon: UserCircle,
+    description: "Kelola users dan anggota"
   },
 ];
 

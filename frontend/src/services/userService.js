@@ -42,6 +42,59 @@ export const getUserById = async (id) => {
   }
 };
 
+// Create user
+export const createUser = async (userData) => {
+  try {
+    const response = await apiClient.post("/users", userData);
+    return {
+      success: true,
+      data: response.data.data,
+      message: "User berhasil dibuat",
+    };
+  } catch (error) {
+    console.error("Error creating user:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Gagal membuat user",
+    };
+  }
+};
+
+// Update user
+export const updateUser = async (id, userData) => {
+  try {
+    const response = await apiClient.put(`/users/${id}`, userData);
+    return {
+      success: true,
+      data: response.data.data,
+      message: "User berhasil diperbarui",
+    };
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Gagal memperbarui user",
+    };
+  }
+};
+
+// Delete user
+export const deleteUser = async (id) => {
+  try {
+    const response = await apiClient.delete(`/users/${id}`);
+    return {
+      success: true,
+      message: response.data.message || "User berhasil dihapus",
+    };
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Gagal menghapus user",
+    };
+  }
+};
+
 
 
 

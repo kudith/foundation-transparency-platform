@@ -1,59 +1,29 @@
 # ============================================
 # Veritas - Docker Compose Configuration
 # ============================================
-# Architecture: Redis + Backend (Node.js) + Frontend (Nginx)
-# Network: All services run on a custom bridge network for isolated communication
+# Architecture: Backend (Node.js) + Frontend (Nginx)
+# Redis: Menggunakan Redis Cloud, tidak perlu container lokal
+# Network: Custom bridge network untuk backend dan frontend
 # ============================================
 
 services:
   # ==========================================
-  # Redis Service
-  # ==========================================
-  # Purpose: Caching layer for application data
-  # Image: Official Redis 7 on Alpine Linux (lightweight)
-  # Port: 6379 (Redis default port)
-  # ==========================================
-  redis:
-    image: redis:7-alpine
-    container_name: veritas-redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379" # Expose Redis port to host (optional, for debugging)
-    networks:
-      - veritas-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"] # Check if Redis responds to PING
-      interval: 10s
-      timeout: 3s
-      retries: 3
-
-  # ==========================================
   # Backend API Service
-  # ==========================================
-  # Purpose: REST API server (Node.js/Express)
-  # Build: Custom Dockerfile from ./backend
-  # Port: 3000 (API endpoint)
-  # Dependencies: Requires Redis to be healthy before starting
   # ==========================================
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
       args:
-        - NODE_ENV=production # Build for production environment
+        - NODE_ENV=production
     container_name: veritas-backend
     restart: unless-stopped
     ports:
-      - "3000:3000" # API accessible at http://localhost:3000
+      - "3000:3000"
     environment:
-      # Override environment variables for Docker networking
       - NODE_ENV=production
-      - REDIS_URI=redis://redis:6379 # Connect to Redis service by container name
     env_file:
-      - ./backend/.env # Load MongoDB URI, JWT secrets, and other sensitive configs
-    depends_on:
-      redis:
-        condition: service_healthy # Wait for Redis to be ready
+      - ./backend/.env
     networks:
       - veritas-network
     healthcheck:
@@ -67,15 +37,10 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s # Allow 40s for backend to initialize before health checks
+      start_period: 40s
 
   # ==========================================
   # Frontend Service
-  # ==========================================
-  # Purpose: Serve static React build via Nginx
-  # Build: Multi-stage Dockerfile (build + serve)
-  # Port: 80 (Nginx default) mapped to host port 5173
-  # Dependencies: Requires backend to be healthy before starting
   # ==========================================
   frontend:
     build:
@@ -95,10 +60,6 @@ services:
 
 # ==========================================
 # Networks
-# ==========================================
-# Custom bridge network for service isolation
-# Services can communicate using container names as hostnames
-# Example: backend connects to "redis:6379" instead of "localhost:6379"
 # ==========================================
 networks:
   veritas-network:

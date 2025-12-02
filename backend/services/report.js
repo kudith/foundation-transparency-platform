@@ -83,14 +83,28 @@ export const createReport = async (reportData) => {
       end_date: endDate,
     };
   } else if (reportData.type === "participant_demographics") {
+    if (!reportData.filters?.community_name || typeof reportData.filters.community_name !== "string") {
+      const error = new Error(
+        "community_name is required and must be a string for participant_demographics report"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
     filters = {
-      communities: reportData.filters.communities || [],
+      community_name: reportData.filters.community_name,
       start_date: startDate,
       end_date: endDate,
     };
   } else if (reportData.type === "program_impact") {
+    if (!reportData.filters?.community_name || typeof reportData.filters.community_name !== "string") {
+      const error = new Error(
+        "community_name is required and must be a string for program_impact report"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
     filters = {
-      community_name: reportData.filters?.community_name,
+      community_name: reportData.filters.community_name,
       start_date: startDate,
       end_date: endDate,
     };
@@ -232,6 +246,23 @@ export const enqueueReportJob = async (reportId) => {
   if (filters.end_date && typeof filters.end_date !== "string") {
     filters.end_date = new Date(filters.end_date).toISOString();
   }
+
+  // Ensure community_name is a valid string for report types that require it
+  if (report.type === "community_activity" || report.type === "program_impact" || report.type === "participant_demographics") {
+    if (!filters.community_name || typeof filters.community_name !== "string") {
+      const error = new Error(
+        `community_name is required and must be a string for ${report.type} report`
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+  } else {
+    // Remove community_name from filters for report types that don't need it
+    delete filters.community_name;
+  }
+  
+  // Remove communities array if it exists (legacy field, worker expects community_name)
+  delete filters.communities;
 
   const payload = {
     task_type: "generate_report",

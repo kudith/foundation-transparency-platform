@@ -10,10 +10,13 @@ import {
 
 const router = express.Router();
 
+// Public routes
 router.get("/", getAllUsers);
 router.get("/:id", getUserById);
-router.post("/", createUser);
-router.put("/:id", updateUser);
-router.delete("/:id", deleteUser);
+
+// Protected routes (require authentication)
+router.post("/", authenticate, createUser);
+router.put("/:id", authenticate, updateUser);
+router.delete("/:id", authenticate, deleteUser);
 
 export default router;
