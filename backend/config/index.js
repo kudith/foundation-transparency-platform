@@ -40,8 +40,10 @@ const config = {
   },
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // HTTPS only in production
-    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+    //    secure: process.env.NODE_ENV === "production", // HTTPS only in production
+    //    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+    secure: process.env.COOKIE_SECURE === "true",
+    sameSite: process.env.COOKIE_SAMESITE || "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for refresh token
     accessMaxAge: 15 * 60 * 1000, // 15 minutes for access token
   },
@@ -54,6 +56,14 @@ const config = {
   },
   bcrypt: {
     rounds: Number.parseInt(process.env.BCRYPT_ROUNDS, 10) || 10,
+  },
+  email: {
+    host: process.env.EMAIL_HOST || "smtp.gmail.com",
+    port: Number.parseInt(process.env.EMAIL_PORT, 10) || 587,
+    secure: process.env.EMAIL_SECURE === "true",
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+    recipient: process.env.EMAIL_RECIPIENT,
   },
 };
 

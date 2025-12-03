@@ -8,6 +8,7 @@ import donationRoutes from "./donation.js";
 import reportRoutes from "./report.js";
 import expenseRoutes from "./expense.js";
 import imageJobRoutes from "./imageJob.js";
+import contactRoutes from "./contact.js";
 
 const router = express.Router();
 
@@ -20,5 +21,6 @@ router.use("/donations", donationRoutes);
 router.use("/expenses", expenseRoutes);
 router.use("/reports", reportRoutes);
 router.use("/image-jobs", imageJobRoutes);
+router.use("/contact", contactRoutes);
 
 export default router;

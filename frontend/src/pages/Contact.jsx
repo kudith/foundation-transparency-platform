@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import apiClient from "@/config/api";
 
 const contactChannels = [
   {
@@ -53,10 +54,48 @@ const contactTopics = [
 
 const Contact = () => {
   const [topic, setTopic] = useState(contactTopics[0]);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState({ type: "", message: "" });
 
-  const handleSubmit = (event) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Placeholder for submission handling
+    setIsSubmitting(true);
+    setSubmitStatus({ type: "", message: "" });
+
+    try {
+      const response = await apiClient.post("/contact", {
+        ...formData,
+        topic,
+      });
+
+      setSubmitStatus({
+        type: "success",
+        message: response.data.message || "Pesan berhasil dikirim!",
+      });
+
+      // Reset form
+      setFormData({ name: "", email: "", message: "" });
+      setTopic(contactTopics[0]);
+    } catch (error) {
+      setSubmitStatus({
+        type: "error",
+        message:
+          error.response?.data?.message ||
+          "Gagal mengirim pesan. Silakan coba lagi.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -121,6 +160,18 @@ const Contact = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {submitStatus.message && (
+                  <div
+                    className={cn(
+                      "mb-6 p-4 text-sm font-serif border",
+                      submitStatus.type === "success"
+                        ? "bg-green-50 text-green-800 border-green-200"
+                        : "bg-red-50 text-red-800 border-red-200"
+                    )}
+                  >
+                    {submitStatus.message}
+                  </div>
+                )}
                 <form
                   className="grid gap-6 font-serif text-sm text-muted-foreground"
                   onSubmit={handleSubmit}
@@ -132,6 +183,9 @@ const Contact = () => {
                       name="name"
                       required
                       placeholder="Nama Anda"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      disabled={isSubmitting}
                       className="border border-border/70 bg-background/90 rounded-none"
                     />
                   </div>
@@ -143,6 +197,9 @@ const Contact = () => {
                       type="email"
                       required
                       placeholder="nama@organisasi.com"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      disabled={isSubmitting}
                       className="border border-border/70 bg-background/90 rounded-none"
                     />
                   </div>
@@ -154,6 +211,7 @@ const Contact = () => {
                           key={item}
                           type="button"
                           variant="outline"
+                          disabled={isSubmitting}
                           className={cn(
                             "border border-border/60 bg-background/80 px-4 py-2 text-xs font-medium tracking-wide text-muted-foreground hover:border-foreground hover:text-foreground",
                             topic === item &&
@@ -175,7 +233,10 @@ const Contact = () => {
                       required
                       rows={5}
                       placeholder="Tuliskan detail permintaan atau pertanyaan Anda"
-                      className="border border-border/70 bg-background/90 p-3 font-serif text-sm text-foreground outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-none"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      disabled={isSubmitting}
+                      className="border border-border/70 bg-background/90 p-3 font-serif text-sm text-foreground outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-none disabled:opacity-50"
                     />
                   </div>
                   <div className="flex flex-wrap justify-between gap-3 text-xs text-muted-foreground">
@@ -185,9 +246,10 @@ const Contact = () => {
                     </span>
                     <Button
                       type="submit"
+                      disabled={isSubmitting}
                       className="h-11 px-6 font-serif text-base"
                     >
-                      Kirim Pesan
+                      {isSubmitting ? "Mengirim..." : "Kirim Pesan"}
                     </Button>
                   </div>
                 </form>
