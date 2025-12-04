@@ -260,9 +260,6 @@ export const enqueueReportJob = async (reportId) => {
     // Remove community_name from filters for report types that don't need it
     delete filters.community_name;
   }
-  
-  // Remove communities array if it exists (legacy field, worker expects community_name)
-  delete filters.communities;
 
   const payload = {
     task_type: "generate_report",

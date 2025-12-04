@@ -1,6 +1,27 @@
 import User from "../models/user.js";
 import mongoose from "mongoose";
 
+// Helper to query by ID (handles both ObjectId and String formats)
+const findByIdFlexible = async (Model, id) => {
+  let doc = null;
+  
+  // Try as ObjectId first (for data imported with ObjectId _id)
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    try {
+      doc = await Model.collection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+    } catch (e) {
+      // Ignore and try as string
+    }
+  }
+  
+  // If not found, try as string
+  if (!doc) {
+    doc = await Model.collection.findOne({ _id: id });
+  }
+  
+  return doc;
+};
+
 export const getAllUsers = async (filters = {}) => {
   const query = {};
 
@@ -28,7 +49,7 @@ export const getAllUsers = async (filters = {}) => {
 };
 
 export const getUserById = async (id) => {
-  const user = await User.findById(id);
+  const user = await findByIdFlexible(User, id);
   if (!user) {
     const error = new Error("User not found");
     error.statusCode = 404;
@@ -64,10 +85,27 @@ export const updateUser = async (id, userData) => {
   if (userData.kategoriUsia) updateData.kategoriUsia = userData.kategoriUsia;
   if (userData.domisili) updateData.domisili = userData.domisili;
 
-  const user = await User.findByIdAndUpdate(id, updateData, {
-    new: true,
-    runValidators: true,
-  });
+  // Try ObjectId first, then string
+  let user = null;
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    try {
+      user = await User.collection.findOneAndUpdate(
+        { _id: new mongoose.Types.ObjectId(id) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+    } catch (e) {
+      // Ignore
+    }
+  }
+  
+  if (!user) {
+    user = await User.collection.findOneAndUpdate(
+      { _id: id },
+      { $set: updateData },
+      { returnDocument: 'after' }
+    );
+  }
 
   if (!user) {
     const error = new Error("User not found");
@@ -79,7 +117,19 @@ export const updateUser = async (id, userData) => {
 };
 
 export const deleteUser = async (id) => {
-  const user = await User.findByIdAndDelete(id);
+  // Try ObjectId first, then string
+  let user = null;
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    try {
+      user = await User.collection.findOneAndDelete({ _id: new mongoose.Types.ObjectId(id) });
+    } catch (e) {
+      // Ignore
+    }
+  }
+  
+  if (!user) {
+    user = await User.collection.findOneAndDelete({ _id: id });
+  }
 
   if (!user) {
     const error = new Error("User not found");

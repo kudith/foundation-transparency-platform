@@ -1,4 +1,4 @@
-import { Home, Calendar, Users, DollarSign, FileText, BarChart3, UserCircle } from "lucide-react";
+import { Home, Calendar, Users, DollarSign, FileText, BarChart3, UserCircle, ShieldCheck } from "lucide-react";
 
 /**
  * Navigation configuration - mudah untuk menambah menu baru
@@ -9,6 +9,7 @@ import { Home, Calendar, Users, DollarSign, FileText, BarChart3, UserCircle } fr
  *    - href: URL path (harus diawali dengan /admin/)
  *    - icon: Import icon dari lucide-react
  *    - description: Tooltip description (optional)
+ *    - roles: Array of roles that can see this menu (optional, default: all roles)
  * 
  * 2. Import icon yang dibutuhkan dari lucide-react di bagian atas
  * 
@@ -59,6 +60,13 @@ export const navigationItems = [
     href: "/admin/users",
     icon: UserCircle,
     description: "Kelola users dan anggota"
+  },
+  {
+    title: "Admin",
+    href: "/admin/admins",
+    icon: ShieldCheck,
+    description: "Kelola akun admin",
+    roles: ["super_admin"] // Only super_admin can see this menu
   },
 ];
 

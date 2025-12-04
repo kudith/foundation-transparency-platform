@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 
+// Admin role constants
+export const ADMIN_ROLES = {
+  ADMIN: "admin",
+  SUPER_ADMIN: "super_admin",
+};
+
 const adminSchema = new mongoose.Schema(
   {
     name: {
@@ -22,6 +28,14 @@ const adminSchema = new mongoose.Schema(
       required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters"],
       select: false, // Exclude password by default
+    },
+    role: {
+      type: String,
+      enum: {
+        values: [ADMIN_ROLES.ADMIN, ADMIN_ROLES.SUPER_ADMIN],
+        message: "Role must be either admin or super_admin",
+      },
+      default: ADMIN_ROLES.ADMIN,
     },
   },
   {

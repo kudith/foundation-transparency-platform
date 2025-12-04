@@ -1,6 +1,27 @@
 import Donation from "../models/donation.js";
 import mongoose from "mongoose";
 
+// Helper to query by ID (handles both ObjectId and String formats)
+const findByIdFlexible = async (Model, id) => {
+  let doc = null;
+  
+  // Try as ObjectId first (for data imported with ObjectId _id)
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    try {
+      doc = await Model.collection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+    } catch (e) {
+      // Ignore and try as string
+    }
+  }
+  
+  // If not found, try as string
+  if (!doc) {
+    doc = await Model.collection.findOne({ _id: id });
+  }
+  
+  return doc;
+};
+
 export const getAllDonations = async (filters = {}) => {
   const query = {};
 
@@ -27,7 +48,7 @@ export const getAllDonations = async (filters = {}) => {
 };
 
 export const getDonationById = async (id) => {
-  const donation = await Donation.findById(id);
+  const donation = await findByIdFlexible(Donation, id);
   if (!donation) {
     const error = new Error("Donation not found");
     error.statusCode = 404;
@@ -154,10 +175,27 @@ export const updateDonation = async (id, donationData) => {
     date: donationData.date,
   };
 
-  const donation = await Donation.findByIdAndUpdate(id, updateData, {
-    new: true,
-    runValidators: true,
-  });
+  // Try ObjectId first, then string
+  let donation = null;
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    try {
+      donation = await Donation.collection.findOneAndUpdate(
+        { _id: new mongoose.Types.ObjectId(id) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+    } catch (e) {
+      // Ignore
+    }
+  }
+  
+  if (!donation) {
+    donation = await Donation.collection.findOneAndUpdate(
+      { _id: id },
+      { $set: updateData },
+      { returnDocument: 'after' }
+    );
+  }
 
   if (!donation) {
     const error = new Error("Donation not found");
@@ -169,7 +207,19 @@ export const updateDonation = async (id, donationData) => {
 };
 
 export const deleteDonation = async (id) => {
-  const donation = await Donation.findByIdAndDelete(id);
+  // Try ObjectId first, then string
+  let donation = null;
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    try {
+      donation = await Donation.collection.findOneAndDelete({ _id: new mongoose.Types.ObjectId(id) });
+    } catch (e) {
+      // Ignore
+    }
+  }
+  
+  if (!donation) {
+    donation = await Donation.collection.findOneAndDelete({ _id: id });
+  }
 
   if (!donation) {
     const error = new Error("Donation not found");

@@ -29,11 +29,8 @@ const ReportSchema = new mongoose.Schema({
     start_date: { type: String },
     end_date: { type: String },
 
-    // Filter khusus untuk community_activity dan program_impact
+    // Filter khusus untuk community_activity, program_impact, dan participant_demographics
     community_name: { type: String },
-
-    // Filter khusus untuk participant_demographics
-    communities: [{ type: String }],
   },
   createdAt: {
     type: Date,

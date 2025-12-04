@@ -22,11 +22,12 @@ export const login = async (loginData) => {
     throw new AppError("Invalid email or password", 401);
   }
 
-  // Prepare payload
+  // Prepare payload (include role for authorization)
   const payload = {
     id: user._id,
     email: user.email,
     name: user.name,
+    role: user.role,
   };
 
   // Generate tokens
@@ -58,11 +59,12 @@ export const refreshAccessToken = async (refreshToken) => {
     throw new AppError("User not found", 404);
   }
 
-  // Generate new access token
+  // Generate new access token (include role for authorization)
   const payload = {
     id: user._id,
     email: user.email,
     name: user.name,
+    role: user.role,
   };
 
   const accessToken = generateAccessToken(payload);

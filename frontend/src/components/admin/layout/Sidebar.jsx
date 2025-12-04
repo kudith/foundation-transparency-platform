@@ -7,11 +7,21 @@ import { navigationItems } from "./navigationConfig";
 
 const Sidebar = ({ className }) => {
   const location = useLocation();
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
 
   const handleLogout = () => {
     logout();
   };
+
+  // Filter navigation items based on user role
+  const filteredNavItems = navigationItems.filter((item) => {
+    // If no roles specified, show to all
+    if (!item.roles || item.roles.length === 0) {
+      return true;
+    }
+    // Check if user's role is in allowed roles
+    return item.roles.includes(user?.role);
+  });
 
   return (
     <aside
@@ -33,9 +43,10 @@ const Sidebar = ({ className }) => {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           <ul className="space-y-1">
-            {navigationItems.map((item) => {
+            {filteredNavItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.href;
+              const isActive = location.pathname === item.href || 
+                location.pathname.startsWith(item.href + "/");
 
               return (
                 <li key={item.href}>

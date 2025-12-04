@@ -1,9 +1,9 @@
-import User from "../models/admin.js";
+import User, { ADMIN_ROLES } from "../models/admin.js";
 import { hashPassword } from "../utils/password.js";
 import { AppError } from "../utils/errorHandler.js";
 
 export const createUser = async (userData) => {
-  const { name, email, password } = userData;
+  const { name, email, password, role = ADMIN_ROLES.ADMIN } = userData;
 
   // Check if user already exists
   const existingUser = await User.findOne({ email });
@@ -19,13 +19,14 @@ export const createUser = async (userData) => {
     name,
     email,
     password: hashedPassword,
+    role,
   });
 
   return user.toJSON();
 };
 
-export const updateUser = async (userId, updateData) => {
-  const { name, email, password } = updateData;
+export const updateUser = async (userId, updateData, requestingUser = null) => {
+  const { name, email, password, role } = updateData;
 
   // Find user
   const user = await User.findById(userId);
@@ -44,6 +45,14 @@ export const updateUser = async (userId, updateData) => {
 
   // Update fields
   if (name) user.name = name;
+
+  // Only super_admin can change roles
+  if (role && role !== user.role) {
+    if (!requestingUser || requestingUser.role !== ADMIN_ROLES.SUPER_ADMIN) {
+      throw new AppError("Only super admin can change user roles", 403);
+    }
+    user.role = role;
+  }
 
   // Hash new password if provided
   if (password) {

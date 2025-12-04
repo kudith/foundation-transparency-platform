@@ -20,6 +20,9 @@ import ReportGenerator from "../../../pages/admin/ReportGenerator";
 import Users from "../../../pages/admin/Users";
 import UserDetail from "../../../pages/admin/UserDetail";
 import UserForm from "../../../pages/admin/UserForm";
+import Admins from "../../../pages/admin/Admins";
+import AdminDetail from "../../../pages/admin/AdminDetail";
+import AdminForm from "../../../pages/admin/AdminForm";
 import { cn } from "../../../lib/utils";
 
 const AdminLayout = () => {
@@ -102,6 +105,12 @@ const AdminLayout = () => {
             <Route path="/users/new" element={<UserForm />} />
             <Route path="/users/:id" element={<UserDetail />} />
             <Route path="/users/:id/edit" element={<UserForm />} />
+
+            {/* Admin management routes */}
+            <Route path="/admins" element={<Admins />} />
+            <Route path="/admins/new" element={<AdminForm />} />
+            <Route path="/admins/:id" element={<AdminDetail />} />
+            <Route path="/admins/:id/edit" element={<AdminForm />} />
 
             {/* Tambahkan route baru di sini dengan mudah */}
           </Routes>

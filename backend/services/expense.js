@@ -1,6 +1,27 @@
 import Expense from "../models/expenses.js";
 import mongoose from "mongoose";
 
+// Helper to query by ID (handles both ObjectId and String formats)
+const findByIdFlexible = async (Model, id) => {
+  let doc = null;
+  
+  // Try as ObjectId first (for data imported with ObjectId _id)
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    try {
+      doc = await Model.collection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+    } catch (e) {
+      // Ignore and try as string
+    }
+  }
+  
+  // If not found, try as string
+  if (!doc) {
+    doc = await Model.collection.findOne({ _id: id });
+  }
+  
+  return doc;
+};
+
 export const getAllExpenses = async (filters = {}) => {
   const query = {};
 
@@ -26,7 +47,7 @@ export const getAllExpenses = async (filters = {}) => {
 };
 
 export const getExpenseById = async (id) => {
-  const expense = await Expense.findById(id);
+  const expense = await findByIdFlexible(Expense, id);
   if (!expense) {
     const error = new Error("Expense not found");
     error.statusCode = 404;
@@ -80,10 +101,27 @@ export const updateExpense = async (id, expenseData) => {
     updateData.description = expenseData.description;
   if (expenseData.date) updateData.date = expenseData.date;
 
-  const expense = await Expense.findByIdAndUpdate(id, updateData, {
-    new: true,
-    runValidators: true,
-  });
+  // Try ObjectId first, then string
+  let expense = null;
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    try {
+      expense = await Expense.collection.findOneAndUpdate(
+        { _id: new mongoose.Types.ObjectId(id) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+    } catch (e) {
+      // Ignore
+    }
+  }
+  
+  if (!expense) {
+    expense = await Expense.collection.findOneAndUpdate(
+      { _id: id },
+      { $set: updateData },
+      { returnDocument: 'after' }
+    );
+  }
 
   if (!expense) {
     const error = new Error("Expense not found");
@@ -95,7 +133,19 @@ export const updateExpense = async (id, expenseData) => {
 };
 
 export const deleteExpense = async (id) => {
-  const expense = await Expense.findByIdAndDelete(id);
+  // Try ObjectId first, then string
+  let expense = null;
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    try {
+      expense = await Expense.collection.findOneAndDelete({ _id: new mongoose.Types.ObjectId(id) });
+    } catch (e) {
+      // Ignore
+    }
+  }
+  
+  if (!expense) {
+    expense = await Expense.collection.findOneAndDelete({ _id: id });
+  }
 
   if (!expense) {
     const error = new Error("Expense not found");

@@ -32,7 +32,8 @@ export const update = async (req, res) => {
       throw new AppError(error.details[0].message, 400);
     }
 
-    const user = await userService.updateUser(id, value);
+    // Pass requesting user for role-based permission check
+    const user = await userService.updateUser(id, value, req.user);
 
     res.status(200).json({
       success: true,
