@@ -4,7 +4,6 @@ export const getAllDonations = async (req, res, next) => {
   try {
     const donations = await donationService.getAllDonations(req.query);
     res.json({ success: true, data: donations });
-    console.log(donations);
   } catch (error) {
     next(error);
   }
