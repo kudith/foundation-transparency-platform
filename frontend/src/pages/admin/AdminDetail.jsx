@@ -431,3 +431,5 @@ const AdminDetail = () => {
 
 export default AdminDetail;
 
+
+
