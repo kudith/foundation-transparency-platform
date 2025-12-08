@@ -19,20 +19,21 @@ export const getAllEvents = async (filters = {}) => {
 
   const events = await Event.find(query).sort({ date: -1 });
   
-  // Populate images from image jobs
+  // Populate images from image jobs (keep parity with detail view and allow fallback to raw URL)
   const eventsWithImages = await Promise.all(
     events.map(async (event) => {
       const eventObj = event.toObject();
       if (eventObj.imageJobIds && eventObj.imageJobIds.length > 0) {
         const imageJobs = await getImageJobsByIds(eventObj.imageJobIds);
         eventObj.images = imageJobs
-          .filter((job) => job.status === "COMPLETED") // UPPERCASE
           .map((job) => ({
             id: job._id,
             publicId: job._id.toString(), // For frontend compatibility
-            url: job.outputImageURL,
+            url: job.outputImageURL || job.sourceImageURL, // show something even if processing not completed
             status: job.status,
-          }));
+            errorMsg: job.errorMsg,
+          }))
+          .filter((image) => Boolean(image.url)); // drop images without any URL
       } else {
         eventObj.images = [];
       }

@@ -101,27 +101,25 @@ const About = () => {
         <section className="flex min-h-[70vh] flex-col items-center justify-center bg-background px-4 text-center md:px-6 py-24">
           <div className="mx-auto max-w-4xl">
             <p className="font-serif text-sm uppercase tracking-[0.3em] text-primary/80">
-              Tentang Kami
+              Tentang SITRA-V
             </p>
             <h1 className="mt-6 font-serif text-4xl font-bold text-foreground md:text-5xl">
-              YAYASAN VERITAS PELITA NUSANTARA
+              SISTEM INFORMASI TRANSPARANSI VERITAS
             </h1>
             <p className="mt-8 font-serif text-lg text-muted-foreground md:text-xl leading-relaxed">
-              <span className="font-semibold text-foreground">"Veritas"</span>{" "}
-              adalah kata yang berasal dari Bahasa Latin, mencerminkan komitmen
-              yayasan terhadap prinsip-prinsip fundamental yang kuat. Sementara{" "}
+              <span className="font-semibold text-foreground">SITRA-V</span> adalah 
+              platform transparansi digital yang dikembangkan oleh{" "}
               <span className="font-semibold text-foreground">
-                "Pelita Nusantara"
+                Yayasan Veritas Pelita Nusantara
               </span>{" "}
-              berarti gambaran terang yang menerangi nusantara, menandakan
-              dedikasi yayasan terhadap kemajuan dan pencerahan bangsa secara
-              keseluruhan.
+              untuk menyajikan informasi lengkap dan terbuka tentang seluruh kegiatan, 
+              program, dan keuangan yayasan kepada publik.
             </p>
             <p className="mt-6 font-serif text-base text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-              Logo Veritas Pelita Nusantara memiliki elemen daun yang sebagian
-              merangkul, sebagian menonjol, melambangkan peran pelopor yang
-              membuka jalan dan menjadi sumber inspirasi bagi mereka yang baru
-              memulai perjalanan mereka.
+              Melalui SITRA-V, kami mewujudkan komitmen terhadap{" "}
+              <span className="font-semibold text-foreground">"Veritas"</span> (kebenaran) 
+              dengan transparansi penuh, membangun kepercayaan melalui akuntabilitas, 
+              dan memberikan akses informasi yang mudah bagi semua pemangku kepentingan.
             </p>
           </div>
         </section>

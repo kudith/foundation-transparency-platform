@@ -54,10 +54,8 @@ const UserForm = () => {
 
   const communityOptions = [
     "all",
-    "Komunitas A",
-    "Komunitas B",
-    "Komunitas C",
-    // Tambahkan komunitas lain sesuai kebutuhan
+    "Nostracode",
+    "Cordis Lingua",
   ];
 
   const roleOptions = [
@@ -274,16 +272,16 @@ const UserForm = () => {
                 <div className="space-y-2">
                   <Label htmlFor="statusPekerjaan">Status Pekerjaan</Label>
                   <Select
-                    value={formData.statusPekerjaan}
+                    value={formData.statusPekerjaan || "none"}
                     onValueChange={(value) =>
-                      handleSelectChange("statusPekerjaan", value)
+                      handleSelectChange("statusPekerjaan", value === "none" ? "" : value)
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih status pekerjaan" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Tidak ada</SelectItem>
+                      <SelectItem value="none">Tidak ada</SelectItem>
                       {statusPekerjaanOptions.map((status) => (
                         <SelectItem key={status} value={status}>
                           {status}
@@ -297,16 +295,16 @@ const UserForm = () => {
                 <div className="space-y-2">
                   <Label htmlFor="kategoriUsia">Kategori Usia</Label>
                   <Select
-                    value={formData.kategoriUsia}
+                    value={formData.kategoriUsia || "none"}
                     onValueChange={(value) =>
-                      handleSelectChange("kategoriUsia", value)
+                      handleSelectChange("kategoriUsia", value === "none" ? "" : value)
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih kategori usia" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Tidak ada</SelectItem>
+                      <SelectItem value="none">Tidak ada</SelectItem>
                       {kategoriUsiaOptions.map((kategori) => (
                         <SelectItem key={kategori} value={kategori}>
                           {kategori}

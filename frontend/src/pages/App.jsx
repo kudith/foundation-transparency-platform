@@ -6,6 +6,7 @@ import Programs from "./Programs";
 import ProgramDetail from "./ProgramDetail";
 import Contact from "./Contact";
 import PublicReports from "./PublicReports";
+import Donations from "./Donations";
 import NotFound from "./NotFound";
 import Forbidden from "./Forbidden";
 import Unauthorized from "./Unauthorized";
@@ -28,6 +29,7 @@ function App() {
       <Route path="/program/:id" element={<ProgramDetail />} />
       <Route path="/kontak" element={<Contact />} />
       <Route path="/laporan" element={<PublicReports />} />
+      <Route path="/donasi" element={<Donations />} />
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />

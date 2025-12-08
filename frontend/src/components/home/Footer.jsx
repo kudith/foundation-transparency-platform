@@ -14,15 +14,15 @@ const Footer = () => {
           <div className="lg:col-span-5 space-y-6">
             <div>
               <h3 className="font-serif text-2xl font-bold text-background mb-3">
-                YAYASAN VERITAS PELITA NUSANTARA
+                SITRA-V
               </h3>
               <p className="font-serif text-xs uppercase tracking-[0.3em] text-secondary/55 mb-4">
-                Veritas • Pelita • Nusantara
+                Sistem Informasi Transparansi Veritas
               </p>
               <p className="font-serif text-sm leading-relaxed text-background/80 max-w-md">
-                Merangkul, membimbing, dan melengkapi setiap individu dalam
-                membentuk pribadi dengan jiwa yang siap berjuang untuk hidup dan
-                impian mereka melalui pemberdayaan komunitas yang inklusif.
+                Platform transparansi digital Yayasan Veritas Pelita Nusantara 
+                yang menyajikan informasi lengkap dan terbuka tentang program, 
+                keuangan, serta kegiatan yayasan untuk membangun kepercayaan publik.
               </p>
             </div>
 
@@ -190,8 +190,7 @@ const Footer = () => {
           {/* Tagline */}
           <div className="mt-6 text-center">
             <p className="font-serif text-xs italic text-background/50">
-              "Menerangi Nusantara Melalui Kebenaran, Integritas, dan
-              Pemberdayaan"
+              "Transparansi untuk Kepercayaan, Akuntabilitas untuk Masa Depan"
             </p>
           </div>
         </div>

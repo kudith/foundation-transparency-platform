@@ -1,6 +1,21 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  LineChart,
+  Line,
+} from "recharts";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -50,6 +65,7 @@ const Donations = () => {
   // Filters
   const [typeFilter, setTypeFilter] = useState("all");
   const [programFilter, setProgramFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all"); // all, month, year
 
   useEffect(() => {
     fetchData();
@@ -78,13 +94,38 @@ const Donations = () => {
     setLoading(false);
   };
 
+  // Helper: Check if date is in current month
+  const isCurrentMonth = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    return (
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear()
+    );
+  };
+
+  // Helper: Check if date is in current year
+  const isCurrentYear = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    return date.getFullYear() === now.getFullYear();
+  };
+
   // Filter donations
   const filteredDonations = donations.filter((donation) => {
     const matchesType =
       typeFilter === "all" || donation.donationType === typeFilter;
     const matchesProgram =
       programFilter === "all" || donation.program === programFilter;
-    return matchesType && matchesProgram;
+
+    let matchesPeriod = true;
+    if (periodFilter === "month") {
+      matchesPeriod = isCurrentMonth(donation.date);
+    } else if (periodFilter === "year") {
+      matchesPeriod = isCurrentYear(donation.date);
+    }
+
+    return matchesType && matchesProgram && matchesPeriod;
   });
 
   // Handle delete
@@ -124,6 +165,90 @@ const Donations = () => {
     }
     return donation.inKindDetails?.estimatedValue || 0;
   };
+
+  // Calculate period-specific stats
+  const donationsThisMonth = donations.filter((d) => isCurrentMonth(d.date));
+  const donationsThisYear = donations.filter((d) => isCurrentYear(d.date));
+
+  const totalValueThisMonth = donationsThisMonth.reduce(
+    (sum, d) => sum + getDonationValue(d),
+    0
+  );
+  const totalValueThisYear = donationsThisYear.reduce(
+    (sum, d) => sum + getDonationValue(d),
+    0
+  );
+
+  // Prepare chart data - Donation type distribution
+  const typeChartData = [
+    {
+      name: "Uang Tunai",
+      value: totalCash,
+      count: stats.find((s) => s._id === "Cash")?.count || 0,
+    },
+    {
+      name: "Barang/Jasa",
+      value: totalInKind,
+      count: stats.find((s) => s._id === "InKind")?.count || 0,
+    },
+  ].filter((item) => item.value > 0);
+
+  // Prepare program distribution
+  const programStats = {};
+  donations.forEach((donation) => {
+    const program = donation.program || "Umum";
+    if (!programStats[program]) {
+      programStats[program] = { total: 0, count: 0 };
+    }
+    programStats[program].total += getDonationValue(donation);
+    programStats[program].count += 1;
+  });
+
+  const programChartData = Object.entries(programStats).map(([name, data]) => ({
+    name,
+    value: data.total,
+    count: data.count,
+  }));
+
+  // Prepare monthly trend data (last 12 months)
+  const getLast12MonthsDonations = () => {
+    const months = [];
+    const now = new Date();
+
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthName = date.toLocaleDateString("id-ID", {
+        month: "short",
+        year: "numeric",
+      });
+
+      const monthDonations = donations.filter((donation) => {
+        const donationDate = new Date(donation.date);
+        return (
+          donationDate.getMonth() === date.getMonth() &&
+          donationDate.getFullYear() === date.getFullYear()
+        );
+      });
+
+      const totalDonation = monthDonations.reduce(
+        (sum, d) => sum + getDonationValue(d),
+        0
+      );
+
+      months.push({
+        month: monthName,
+        donasi: totalDonation,
+        jumlah: monthDonations.length,
+      });
+    }
+
+    return months;
+  };
+
+  const monthlyDonationTrend = getLast12MonthsDonations();
+
+  // Colors for charts
+  const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#8b5cf6", "#ec4899"];
 
   return (
     <div className="space-y-6">
@@ -242,6 +367,236 @@ const Donations = () => {
         </Card>
       </div>
 
+      {/* Period Stats */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Bulan Ini</CardTitle>
+            <CardDescription>
+              Donasi bulan{" "}
+              {new Date().toLocaleDateString("id-ID", {
+                month: "long",
+                year: "numeric",
+              })}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <Skeleton className="h-12 w-full" />
+            ) : (
+              <div className="space-y-2">
+                <div className="text-3xl font-bold text-green-600">
+                  {formatCurrency(totalValueThisMonth)}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {donationsThisMonth.length} donasi terkumpul
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Tahun Ini</CardTitle>
+            <CardDescription>
+              Total donasi tahun {new Date().getFullYear()}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <Skeleton className="h-12 w-full" />
+            ) : (
+              <div className="space-y-2">
+                <div className="text-3xl font-bold text-green-600">
+                  {formatCurrency(totalValueThisYear)}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {donationsThisYear.length} donasi terkumpul
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Filter Periode</CardTitle>
+            <CardDescription>Lihat donasi berdasarkan periode</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Select value={periodFilter} onValueChange={setPeriodFilter}>
+              <SelectTrigger>
+                <Calendar className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Waktu</SelectItem>
+                <SelectItem value="month">Bulan Ini</SelectItem>
+                <SelectItem value="year">Tahun Ini</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts Section */}
+      {!loading && donations.length > 0 && (
+        <>
+          {/* Type Distribution & Program Distribution */}
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Pie Chart - Donation Type */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">
+                  Distribusi Tipe Donasi
+                </CardTitle>
+                <CardDescription>
+                  Perbandingan donasi tunai vs barang/jasa
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={typeChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) =>
+                        `${name} (${(percent * 100).toFixed(0)}%)`
+                      }
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {typeChartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${entry.name}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value) => formatCurrency(value)}
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--background))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Pie Chart - Program Distribution */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">
+                  Distribusi Per Program
+                </CardTitle>
+                <CardDescription>Donasi berdasarkan program</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={programChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) =>
+                        `${name} (${(percent * 100).toFixed(0)}%)`
+                      }
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {programChartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${entry.name}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value) => formatCurrency(value)}
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--background))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Line Chart - Monthly Trend */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">
+                Trend Donasi 12 Bulan Terakhir
+              </CardTitle>
+              <CardDescription>Grafik donasi bulanan</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={350}>
+                <LineChart data={monthlyDonationTrend}>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    dataKey="month"
+                    stroke="hsl(var(--foreground))"
+                    fontSize={11}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis
+                    stroke="hsl(var(--foreground))"
+                    fontSize={12}
+                    tickFormatter={(value) =>
+                      value >= 1000000
+                        ? `${(value / 1000000).toFixed(1)}jt`
+                        : `${(value / 1000).toFixed(0)}rb`
+                    }
+                  />
+                  <Tooltip
+                    formatter={(value, name) => {
+                      if (name === "donasi") {
+                        return [formatCurrency(value), "Donasi"];
+                      }
+                      return [value, "Jumlah Donasi"];
+                    }}
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "8px",
+                    }}
+                  />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="donasi"
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    dot={{ fill: "#10b981", r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </>
+      )}
+
       {/* Donations List */}
       <Card>
         <CardHeader>
@@ -250,6 +605,11 @@ const Donations = () => {
               <CardTitle>Daftar Donasi</CardTitle>
               <CardDescription>
                 {filteredDonations.length} dari {donations.length} donasi
+                {periodFilter !== "all" && (
+                  <span className="ml-2 text-primary">
+                    ({periodFilter === "month" ? "Bulan Ini" : "Tahun Ini"})
+                  </span>
+                )}
               </CardDescription>
             </div>
           </div>

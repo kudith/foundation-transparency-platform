@@ -26,7 +26,6 @@ import {
   DollarSign,
   Users,
   UserCheck,
-  TrendingUp,
   Filter,
   Calendar,
 } from "lucide-react";
@@ -77,7 +76,6 @@ const PublicReports = () => {
       DollarSign,
       Users,
       UserCheck,
-      TrendingUp,
       FileText,
     };
     return icons[iconName] || FileText;
@@ -266,7 +264,9 @@ const PublicReports = () => {
                     <h3 className="text-lg font-semibold mb-2">
                       Gagal Memuat Data
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-4">{error}</p>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {error}
+                    </p>
                     <Button onClick={fetchData} variant="outline">
                       <RefreshCw className="h-4 w-4 mr-2" />
                       Coba Lagi
@@ -384,4 +384,3 @@ const PublicReports = () => {
 };
 
 export default PublicReports;
-

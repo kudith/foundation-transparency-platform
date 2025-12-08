@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { to: "/tentang", label: "Tentang Kami" },
   { to: "/program", label: "Program" },
+  { to: "/donasi", label: "Donasi" },
   { to: "/laporan", label: "Laporan" },
   { to: "/kontak", label: "Kontak" },
 ];
@@ -33,7 +34,7 @@ const Header = () => {
           to="/"
           className="font-serif text-lg font-semibold text-foreground transition-colors hover:text-foreground/80"
         >
-          Veritas Pelita Nusantara
+          SITRA-V
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">

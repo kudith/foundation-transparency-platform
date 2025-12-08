@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Card,
@@ -7,42 +7,103 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
-import { useProgramStore } from "@/store/useProgramStore";
+import { getAllEvents, getEventStatus } from "@/services/eventService";
+import { getDonationStats } from "@/services/donationService";
 
 const Statistics = () => {
-  const { statistics, fetchStatistics } = useProgramStore();
-
-  useEffect(() => {
-    if (!statistics) {
-      fetchStatistics();
-    }
-  }, [statistics, fetchStatistics]);
-
-  if (!statistics) return null;
-
-  const stats = [
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState([
     {
       label: "Total Program",
-      value: statistics.totalPrograms,
+      value: "0",
       description: "Kegiatan pemberdayaan yang telah kami selenggarakan.",
     },
     {
       label: "Program Aktif",
-      value: statistics.activePrograms,
-      description: "Program yang sedang berjalan untuk memberdayakan komunitas.",
+      value: "0",
+      description:
+        "Program yang sedang berjalan untuk memberdayakan komunitas.",
     },
     {
       label: "Total Anggaran",
-      value: `Rp ${(statistics.totalBudget / 1_000_000_000).toFixed(1)}M`,
+      value: "Rp 0",
       description: "Dana yang dialokasikan untuk pengembangan komunitas.",
     },
-    {
-      label: "Penerima Manfaat",
-      value: statistics.totalBeneficiaries.toLocaleString("id-ID"),
-      description: "Individu yang telah bergabung dan berkembang bersama kami.",
-    },
-  ];
+  ]);
+
+  useEffect(() => {
+    fetchStatistics();
+  }, []);
+
+  const fetchStatistics = async () => {
+    setLoading(true);
+
+    try {
+      const [eventsResult, donationStatsResult] = await Promise.all([
+        getAllEvents(),
+        getDonationStats(),
+      ]);
+
+      let totalPrograms = 0;
+      let activePrograms = 0;
+      let totalBudget = 0;
+
+      // Count total programs (events)
+      if (eventsResult.success) {
+        totalPrograms = eventsResult.data.length;
+
+        // Count active programs (upcoming or ongoing)
+        activePrograms = eventsResult.data.filter((event) => {
+          const status = getEventStatus(event.date);
+          return status === "upcoming" || status === "ongoing";
+        }).length;
+      }
+
+      // Calculate total budget from donations
+      if (donationStatsResult.success && donationStatsResult.data) {
+        donationStatsResult.data.forEach((stat) => {
+          totalBudget += stat.totalAmount || 0;
+        });
+      }
+
+      // Format budget display
+      const formatBudget = (amount) => {
+        if (amount >= 1_000_000_000) {
+          return `Rp ${(amount / 1_000_000_000).toFixed(1)}M`;
+        } else if (amount >= 1_000_000) {
+          return `Rp ${(amount / 1_000_000).toFixed(1)}Jt`;
+        } else if (amount > 0) {
+          return `Rp ${(amount / 1_000).toFixed(0)}K`;
+        }
+        return "Rp 0";
+      };
+
+      setStats([
+        {
+          label: "Total Program",
+          value: totalPrograms.toString(),
+          description: "Kegiatan pemberdayaan yang telah kami selenggarakan.",
+        },
+        {
+          label: "Program Aktif",
+          value: activePrograms.toString(),
+          description:
+            "Program yang sedang berjalan untuk memberdayakan komunitas.",
+        },
+        {
+          label: "Total Anggaran",
+          value: formatBudget(totalBudget),
+          description: "Dana yang dialokasikan untuk pengembangan komunitas.",
+        },
+      ]);
+    } catch (error) {
+      console.error("Error fetching statistics:", error);
+    }
+
+    setLoading(false);
+  };
 
   return (
     <section className="bg-foreground/95 py-16 md:py-20">
@@ -55,21 +116,25 @@ const Statistics = () => {
             Pertumbuhan Melalui Pemberdayaan Berkelanjutan
           </h2>
           <p className="mt-4 font-serif text-base text-background/70">
-            Setiap angka mencerminkan perjalanan individu yang kami rangkul, bimbing, 
-            dan lengkapi untuk mencapai potensi terbaik mereka.
+            Setiap angka mencerminkan perjalanan individu yang kami rangkul,
+            bimbing, dan lengkapi untuk mencapai potensi terbaik mereka.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {stats.map((stat) => (
             <Card
               key={stat.label}
               className="border-border/40 bg-background/95 text-foreground"
             >
               <CardHeader>
-                <CardTitle className="font-serif text-3xl font-semibold text-foreground">
-                  {stat.value}
-                </CardTitle>
+                {loading ? (
+                  <Skeleton className="h-10 w-24 bg-muted" />
+                ) : (
+                  <CardTitle className="font-serif text-3xl font-semibold text-foreground">
+                    {stat.value}
+                  </CardTitle>
+                )}
                 <CardDescription className="font-serif text-sm uppercase tracking-wide text-muted-foreground">
                   {stat.label}
                 </CardDescription>

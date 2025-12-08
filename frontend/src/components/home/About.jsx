@@ -25,20 +25,19 @@ const About = () => {
             Tentang Kami
           </p>
           <h2 className="font-serif text-3xl font-semibold text-foreground md:text-4xl">
-            Pelita yang Menerangi Perjalanan Pembelajaran Nusantara
+            Transparansi Melalui Informasi yang Terbuka
           </h2>
           <p className="font-serif text-base leading-relaxed text-muted-foreground">
-            <span className="font-semibold text-foreground">"Veritas"</span> berasal dari Bahasa Latin yang berarti kebenaran, 
-            mencerminkan komitmen kami terhadap integritas dan transparansi. Sementara{" "}
-            <span className="font-semibold text-foreground">"Pelita Nusantara"</span> melambangkan cahaya 
-            yang menerangi seluruh nusantara, menandakan dedikasi kami untuk membawa pencerahan dan kemajuan 
-            kepada masyarakat Indonesia.
+            <span className="font-semibold text-foreground">SITRA-V</span> menyajikan 
+            seluruh informasi kegiatan Yayasan Veritas Pelita Nusantara secara terbuka. 
+            Dari legalitas yayasan hingga detail setiap program dan keuangan, semua dapat 
+            diakses publik untuk membangun kepercayaan dan akuntabilitas.
           </p>
           <p className="font-serif text-base leading-relaxed text-muted-foreground">
             Kami memberdayakan komunitas melalui pembelajaran bahasa Inggris di{" "}
             <span className="font-semibold text-foreground">CORDIS LINGUA</span> dan pengembangan 
             keterampilan coding di <span className="font-semibold text-foreground">NOSTRACODE</span>. 
-            Bersama, kami membangun fondasi yang kuat untuk masa depan yang lebih cerah.
+            SITRA-V memastikan setiap langkah kami tercatat dan terlaporkan dengan jelas.
           </p>
 
           <Button variant="outline" asChild className="font-serif text-sm">
